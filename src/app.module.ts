@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { CommonModule } from '@common/common.module';
 import LoggerMiddleware from '@common/middleware/logger.middleware';
+import { ConfigModule } from '@config/config.module';
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, ConfigModule],
   controllers: [],
   providers: [],
 })
