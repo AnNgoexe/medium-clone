@@ -1,5 +1,14 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
 
+const colors = {
+  reset: '\x1b[0m',
+  green: '\x1b[32m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+};
+
 @Injectable()
 export default class LoggerService extends ConsoleLogger {
   constructor(context: string) {
@@ -29,5 +38,23 @@ export default class LoggerService extends ConsoleLogger {
 
   verbose(message: string, ...optionalParams: unknown[]): void {
     super.verbose(`[VERBOSE] ${message}`, ...optionalParams);
+  }
+
+  logJson(
+    label: string,
+    data: unknown,
+    level: 'log' | 'debug' | 'error' | 'warn' | 'verbose' = 'debug',
+  ): void {
+    const formattedJson = JSON.stringify(data, null, 2);
+    const color = {
+      log: colors.green,
+      error: colors.red,
+      debug: colors.magenta,
+      warn: colors.yellow,
+      verbose: colors.cyan,
+    }[level];
+
+    const formattedMessage = `${color} [${level.toUpperCase()}] ${label}:\n${formattedJson}${colors.reset}`;
+    super[level](formattedMessage);
   }
 }
