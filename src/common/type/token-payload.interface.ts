@@ -20,16 +20,16 @@ export interface AccessTokenPayload extends AccessTokenPayloadInput {
 }
 
 // Payload data required to create a Refresh Token.
-export interface RefreshTokenPayloadInput {
-  // Unique identifier of the user
-  userId: number;
-}
+// export interface RefreshTokenPayloadInput {
+//   // Unique identifier of the user
+//   userId: number;
+// }
 
 // The decoded Refresh Token payload after verification.
-export interface RefreshTokenPayload extends RefreshTokenPayloadInput {
-  // Issued At timestamp
-  iat: number;
-
-  // Expiration timestamp
-  exp: number;
-}
+// export interface RefreshTokenPayload extends RefreshTokenPayloadInput {
+//   // Issued At timestamp
+//   iat: number;
+//
+//   // Expiration timestamp
+//   exp: number;
+// }

@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -10,11 +11,9 @@ import LoggerService from '@common/service/logger.service';
 import {
   ERROR_USER_NOT_FOUND,
   ERROR_PASSWORD_INVALID,
+  ERROR_USER_ALREADY_EXISTS,
 } from '@common/constant/error.constant';
-import {
-  AccessTokenPayloadInput,
-  RefreshTokenPayloadInput,
-} from '@common/type/token-payload.interface';
+import { AccessTokenPayloadInput } from '@common/type/token-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -25,11 +24,22 @@ export class AuthService {
     private readonly logger: LoggerService,
   ) {}
 
+  // Private method để tạo access token từ user object
+  private async createAccessToken(user: {
+    id: number;
+    username: string;
+    email: string;
+  }): Promise<string> {
+    const payload: AccessTokenPayloadInput = {
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    return this.tokenService.generateAccessToken(payload);
+  }
+
   // Method to validate user credentials
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async validateUser(email: string, password: string): Promise<object> {
     // Validate input parameters
     this.logger.log(`Attempting login for email: ${email}`);
     const user = await this.prisma.user.findUnique({
@@ -37,8 +47,10 @@ export class AuthService {
       select: {
         id: true,
         email: true,
-        password: true,
         username: true,
+        password: true,
+        bio: true,
+        image: true,
       },
     });
 
@@ -58,35 +70,67 @@ export class AuthService {
       throw new UnauthorizedException(ERROR_PASSWORD_INVALID);
     }
 
-    // Prepare payloads for access and refresh tokens
-    const accessTokenPayload: AccessTokenPayloadInput = {
-      userId: user.id,
-      username: user.username,
-      email: user.email,
-    };
-    const refreshTokenPayload: RefreshTokenPayloadInput = {
-      userId: user.id,
-    };
-
     // Generate access and refresh tokens
-    const { accessToken, refreshToken } = await this.generateTokens(
-      accessTokenPayload,
-      refreshTokenPayload,
-    );
+    const token = await this.createAccessToken(user);
     this.logger.log(`Login successful for user: ${user.username}`);
-    return { accessToken, refreshToken };
+    return {
+      user: {
+        email: user.email,
+        username: user.username,
+        bio: user.bio || null,
+        image: user.image || null,
+        token,
+      },
+    };
   }
 
-  // Generate access and refresh tokens for the user
-  private async generateTokens(
-    accessPayload: AccessTokenPayloadInput,
-    refreshPayload: RefreshTokenPayloadInput,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.tokenService.generateAccessToken(accessPayload),
-      this.tokenService.generateRefreshToken(refreshPayload),
-    ]);
-    this.logger.debug('Tokens generated successfully');
-    return { accessToken, refreshToken };
+  // Method to register a new user
+  async register(
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<object> {
+    this.logger.log(`Registering user with email: ${email}`);
+
+    // Check if email or username already exists
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
+    });
+
+    if (existingUser) {
+      this.logger.warn(
+        `User already exists with email or username: ${email} / ${username}`,
+      );
+      throw new ConflictException(ERROR_USER_ALREADY_EXISTS);
+    }
+
+    // Hash password before saving
+    const hashedPassword = await this.passwordService.hashPassword(password);
+
+    // Create new user
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        username,
+        password: hashedPassword,
+        bio: '',
+        image: '',
+      },
+    });
+
+    const token = await this.createAccessToken(user);
+    this.logger.log(`User registered successfully: ${username}`);
+
+    return {
+      user: {
+        email: user.email,
+        username: user.username,
+        bio: user.bio || null,
+        image: user.image || null,
+        token,
+      },
+    };
   }
 }

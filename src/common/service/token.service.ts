@@ -6,17 +6,17 @@ import { JwtConfig } from '@config/jwt.config';
 import {
   AccessTokenPayload,
   AccessTokenPayloadInput,
-  RefreshTokenPayload,
-  RefreshTokenPayloadInput,
+  // RefreshTokenPayload,
+  // RefreshTokenPayloadInput,
 } from '@common/type/token-payload.interface';
 import * as jwt from 'jsonwebtoken';
 import {
   ERROR_ACCESS_TOKEN_EXPIRED,
   ERROR_INVALID_ACCESS_TOKEN,
-  ERROR_INVALID_REFRESH_TOKEN,
-  ERROR_REFRESH_TOKEN_EXPIRED,
+  // ERROR_INVALID_REFRESH_TOKEN,
+  // ERROR_REFRESH_TOKEN_EXPIRED,
   ERROR_UNKNOWN_ACCESS_TOKEN,
-  ERROR_UNKNOWN_REFRESH_TOKEN,
+  // ERROR_UNKNOWN_REFRESH_TOKEN,
 } from '@common/constant/error.constant';
 
 @Injectable()
@@ -75,23 +75,23 @@ export default class TokenService {
   }
 
   // Generate a signed refresh token with given payload
-  async generateRefreshToken(
-    payload: RefreshTokenPayloadInput,
-  ): Promise<string> {
-    try {
-      this.logger.log('Generating Refresh Token...');
-      const token = await this.jwtService.signAsync(payload, {
-        secret: this.refreshTokenKey,
-        expiresIn: this.refreshTokenExpiresIn,
-        algorithm: 'HS256',
-      });
-      this.logger.log('Refresh Token generated successfully');
-      return token;
-    } catch (error) {
-      this.logger.error('Error generating refresh token', error);
-      throw new Error('Failed to generate refresh token');
-    }
-  }
+  // async generateRefreshToken(
+  //   payload: RefreshTokenPayloadInput,
+  // ): Promise<string> {
+  //   try {
+  //     this.logger.log('Generating Refresh Token...');
+  //     const token = await this.jwtService.signAsync(payload, {
+  //       secret: this.refreshTokenKey,
+  //       expiresIn: this.refreshTokenExpiresIn,
+  //       algorithm: 'HS256',
+  //     });
+  //     this.logger.log('Refresh Token generated successfully');
+  //     return token;
+  //   } catch (error) {
+  //     this.logger.error('Error generating refresh token', error);
+  //     throw new Error('Failed to generate refresh token');
+  //   }
+  // }
 
   // Verify access token and return decoded payload
   async verifyAccessToken(token: string): Promise<AccessTokenPayload> {
@@ -123,31 +123,31 @@ export default class TokenService {
   }
 
   // Verify refresh token and return decoded payload
-  async verifyRefreshToken(token: string): Promise<RefreshTokenPayload> {
-    try {
-      this.logger.log('Verifying Refresh Token...');
-      const payload = await this.jwtService.verifyAsync<RefreshTokenPayload>(
-        token,
-        {
-          secret: this.refreshTokenKey,
-          algorithms: ['HS256'],
-        },
-      );
-      this.logger.log('Refresh Token verified successfully');
-      return payload;
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        this.logger.error('Refresh Token expired');
-        throw new UnauthorizedException(ERROR_REFRESH_TOKEN_EXPIRED);
-      }
-
-      if (error instanceof jwt.JsonWebTokenError) {
-        this.logger.error('Invalid Refresh Token');
-        throw new UnauthorizedException(ERROR_INVALID_REFRESH_TOKEN);
-      }
-
-      this.logger.error('Unexpected error verifying Refresh Token', error);
-      throw new UnauthorizedException(ERROR_UNKNOWN_REFRESH_TOKEN);
-    }
-  }
+  // async verifyRefreshToken(token: string): Promise<RefreshTokenPayload> {
+  //   try {
+  //     this.logger.log('Verifying Refresh Token...');
+  //     const payload = await this.jwtService.verifyAsync<RefreshTokenPayload>(
+  //       token,
+  //       {
+  //         secret: this.refreshTokenKey,
+  //         algorithms: ['HS256'],
+  //       },
+  //     );
+  //     this.logger.log('Refresh Token verified successfully');
+  //     return payload;
+  //   } catch (error) {
+  //     if (error instanceof jwt.TokenExpiredError) {
+  //       this.logger.error('Refresh Token expired');
+  //       throw new UnauthorizedException(ERROR_REFRESH_TOKEN_EXPIRED);
+  //     }
+  //
+  //     if (error instanceof jwt.JsonWebTokenError) {
+  //       this.logger.error('Invalid Refresh Token');
+  //       throw new UnauthorizedException(ERROR_INVALID_REFRESH_TOKEN);
+  //     }
+  //
+  //     this.logger.error('Unexpected error verifying Refresh Token', error);
+  //     throw new UnauthorizedException(ERROR_UNKNOWN_REFRESH_TOKEN);
+  //   }
+  // }
 }

@@ -19,19 +19,19 @@ export const ERROR_INVALID_ACCESS_TOKEN = {
   errorCode: 'ERROR_INVALID_ACCESS_TOKEN',
 };
 
-export const ERROR_REFRESH_TOKEN_EXPIRED = {
-  statusCode: 401,
-  error: 'Unauthorized',
-  message: 'Refresh token expired',
-  errorCode: 'ERROR_REFRESH_TOKEN_EXPIRED',
-};
+// export const ERROR_REFRESH_TOKEN_EXPIRED = {
+//   statusCode: 401,
+//   error: 'Unauthorized',
+//   message: 'Refresh token expired',
+//   errorCode: 'ERROR_REFRESH_TOKEN_EXPIRED',
+// };
 
-export const ERROR_INVALID_REFRESH_TOKEN = {
-  statusCode: 401,
-  error: 'Unauthorized',
-  message: 'Invalid refresh token',
-  errorCode: 'ERROR_INVALID_REFRESH_TOKEN',
-};
+// export const ERROR_INVALID_REFRESH_TOKEN = {
+//   statusCode: 401,
+//   error: 'Unauthorized',
+//   message: 'Invalid refresh token',
+//   errorCode: 'ERROR_INVALID_REFRESH_TOKEN',
+// };
 
 export const ERROR_UNKNOWN_ACCESS_TOKEN = {
   statusCode: 401,
@@ -40,12 +40,12 @@ export const ERROR_UNKNOWN_ACCESS_TOKEN = {
   errorCode: 'ERROR_UNKNOWN_ACCESS_TOKEN',
 };
 
-export const ERROR_UNKNOWN_REFRESH_TOKEN = {
-  statusCode: 401,
-  error: 'Unauthorized',
-  message: 'Could not verify refresh token',
-  errorCode: 'ERROR_UNKNOWN_REFRESH_TOKEN',
-};
+// export const ERROR_UNKNOWN_REFRESH_TOKEN = {
+//   statusCode: 401,
+//   error: 'Unauthorized',
+//   message: 'Could not verify refresh token',
+//   errorCode: 'ERROR_UNKNOWN_REFRESH_TOKEN',
+// };
 
 export const ERROR_MISSING_AUTH_HEADER = {
   statusCode: 401,
@@ -94,4 +94,10 @@ export const ERROR_PASSWORD_INVALID = {
   error: 'Unauthorized',
   message: 'Invalid password',
   errorCode: 'ERROR_PASSWORD_INVALID',
+};
+
+export const ERROR_USER_ALREADY_EXISTS = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'User with this email or username already exists',
 };
