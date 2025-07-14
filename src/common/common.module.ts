@@ -7,8 +7,10 @@ import TokenService from '@common/service/token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import JwtAuthGuard from '@common/guard/jwt-auth.guard';
+import PrismaService from '@common/service/prisma.service';
+import { CustomValidationPipe } from '@common/pipe/CustomValidationPipe';
 
-const service = [LoggerService, TokenService];
+const service = [LoggerService, TokenService, PrismaService];
 
 @Global()
 @Module({
@@ -30,6 +32,10 @@ const service = [LoggerService, TokenService];
     {
       provide: 'APP_GUARD',
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: 'APP_PIPE',
+      useClass: CustomValidationPipe,
     },
   ],
   exports: [...service],

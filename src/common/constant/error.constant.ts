@@ -74,3 +74,10 @@ export const ERROR_MISSING_USER_EMAIL = {
   message: 'Missing email in token payload',
   errorCode: 'ERROR_MISSING_USER_EMAIL',
 };
+
+export const ERROR_CLASS_VALIDATION_FAILED = {
+  statusCode: 400,
+  error: 'Bad Request',
+  message: 'Class validation failed',
+  errorCode: 'ERROR_CLASS_VALIDATION_FAILED',
+};
