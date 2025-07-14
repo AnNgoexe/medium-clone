@@ -3,12 +3,16 @@ import LoggerService from '@common/service/logger.service';
 import HttpExceptionFilter from '@common/filter/http-exception.filter';
 import AllExceptionsFilter from '@common/filter/all-exception.filter';
 import ResponseInterceptor from '@common/interceptor/response.interceptor';
+import TokenService from '@common/service/token.service';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
+import JwtAuthGuard from '@common/guard/jwt-auth.guard';
 
-const service = [LoggerService];
+const service = [LoggerService, TokenService];
 
 @Global()
 @Module({
-  imports: [],
+  imports: [JwtModule, ConfigModule],
   providers: [
     ...service,
     {
@@ -22,6 +26,10 @@ const service = [LoggerService];
     {
       provide: 'APP_INTERCEPTOR',
       useClass: ResponseInterceptor,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
     },
   ],
   exports: [...service],
