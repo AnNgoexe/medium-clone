@@ -1,5 +1,5 @@
 export interface ResponsePayload<T = unknown> {
-  message: 'string';
+  message: string;
   data: T;
 }
 

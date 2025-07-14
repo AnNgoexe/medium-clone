@@ -9,8 +9,9 @@ import { ConfigModule } from '@nestjs/config';
 import JwtAuthGuard from '@common/guard/jwt-auth.guard';
 import PrismaService from '@common/service/prisma.service';
 import { CustomValidationPipe } from '@common/pipe/CustomValidationPipe';
+import PasswordService from '@common/service/password.service';
 
-const service = [LoggerService, TokenService, PrismaService];
+const service = [LoggerService, TokenService, PrismaService, PasswordService];
 
 @Global()
 @Module({

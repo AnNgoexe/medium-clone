@@ -7,9 +7,10 @@ import {
 import { CommonModule } from '@common/common.module';
 import LoggerMiddleware from '@common/middleware/logger.middleware';
 import { ConfigModule } from '@config/config.module';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
-  imports: [CommonModule, ConfigModule],
+  imports: [CommonModule, ConfigModule, AuthModule],
   controllers: [],
   providers: [],
 })

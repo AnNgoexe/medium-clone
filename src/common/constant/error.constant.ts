@@ -81,3 +81,17 @@ export const ERROR_CLASS_VALIDATION_FAILED = {
   message: 'Class validation failed',
   errorCode: 'ERROR_CLASS_VALIDATION_FAILED',
 };
+
+export const ERROR_USER_NOT_FOUND = {
+  statusCode: 404,
+  error: 'Not Found',
+  message: 'User not found',
+  errorCode: 'ERROR_USER_NOT_FOUND',
+};
+
+export const ERROR_PASSWORD_INVALID = {
+  statusCode: 401,
+  error: 'Unauthorized',
+  message: 'Invalid password',
+  errorCode: 'ERROR_PASSWORD_INVALID',
+};
