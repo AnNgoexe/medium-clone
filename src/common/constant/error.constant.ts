@@ -19,33 +19,12 @@ export const ERROR_INVALID_ACCESS_TOKEN = {
   errorCode: 'ERROR_INVALID_ACCESS_TOKEN',
 };
 
-// export const ERROR_REFRESH_TOKEN_EXPIRED = {
-//   statusCode: 401,
-//   error: 'Unauthorized',
-//   message: 'Refresh token expired',
-//   errorCode: 'ERROR_REFRESH_TOKEN_EXPIRED',
-// };
-
-// export const ERROR_INVALID_REFRESH_TOKEN = {
-//   statusCode: 401,
-//   error: 'Unauthorized',
-//   message: 'Invalid refresh token',
-//   errorCode: 'ERROR_INVALID_REFRESH_TOKEN',
-// };
-
 export const ERROR_UNKNOWN_ACCESS_TOKEN = {
   statusCode: 401,
   error: 'Unauthorized',
   message: 'Could not verify access token',
   errorCode: 'ERROR_UNKNOWN_ACCESS_TOKEN',
 };
-
-// export const ERROR_UNKNOWN_REFRESH_TOKEN = {
-//   statusCode: 401,
-//   error: 'Unauthorized',
-//   message: 'Could not verify refresh token',
-//   errorCode: 'ERROR_UNKNOWN_REFRESH_TOKEN',
-// };
 
 export const ERROR_MISSING_AUTH_HEADER = {
   statusCode: 401,
