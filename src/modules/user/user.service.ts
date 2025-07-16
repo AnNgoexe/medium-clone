@@ -82,4 +82,29 @@ export class UserService {
       token,
     };
   }
+
+  async getCurrentUser(userId: number): Promise<object> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+    }
+
+    const payload: AccessTokenPayloadInput = {
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    const token: string = await this.tokenService.generateAccessToken(payload);
+
+    return {
+      email: user.email,
+      username: user.username,
+      bio: user.bio,
+      image: user.image,
+      token,
+    };
+  }
 }

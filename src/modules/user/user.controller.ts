@@ -5,6 +5,7 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import UpdateUserDto from '@modules/user/update-user.dto';
@@ -32,6 +33,18 @@ export class UserController {
     return {
       message: 'User updated successfully',
       data: updatedUser,
+    };
+  }
+
+  @Auth(AuthType.ACCESS_TOKEN)
+  @Get('user')
+  @HttpCode(HttpStatus.OK)
+  async getCurrentUser(@Req() req: Request): Promise<ResponsePayload> {
+    const userId = req.user?.userId;
+    const user = await this.userService.getCurrentUser(userId as number);
+    return {
+      message: 'User retrieved successfully',
+      data: user,
     };
   }
 }
