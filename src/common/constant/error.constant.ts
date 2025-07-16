@@ -80,3 +80,17 @@ export const ERROR_USER_ALREADY_EXISTS = {
   error: 'Conflict',
   message: 'User with this email or username already exists',
 };
+
+export const ERROR_EMAIL_ALREADY_EXISTS = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'Email is already in use',
+  errorCode: 'ERROR_EMAIL_ALREADY_EXISTS',
+};
+
+export const ERROR_USERNAME_ALREADY_EXISTS = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'Username is already in use',
+  errorCode: 'ERROR_USERNAME_ALREADY_EXISTS',
+};
