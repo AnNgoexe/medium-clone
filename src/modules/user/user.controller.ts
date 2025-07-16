@@ -23,12 +23,12 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async updateCurrentUser(
     @Req() req: Request,
-    @Body('user') dto: UpdateUserDto,
+    @Body('user') updateUserDto: UpdateUserDto,
   ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
     const updatedUser = await this.userService.updateUser(
       userId as number,
-      dto,
+      updateUserDto,
     );
     return {
       message: 'User updated successfully',
