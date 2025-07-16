@@ -22,7 +22,10 @@ export class UserService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async updateUser(userId: number, dto: UpdateUserDto): Promise<object> {
+  async updateUser(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<object> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -31,25 +34,28 @@ export class UserService {
       throw new NotFoundException(ERROR_USER_NOT_FOUND);
     }
 
-    if (dto.email && dto.email !== existingUser.email) {
+    if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
       const emailExists = await this.prisma.user.findUnique({
-        where: { email: dto.email },
+        where: { email: updateUserDto.email },
       });
       if (emailExists) {
         throw new ConflictException(ERROR_EMAIL_ALREADY_EXISTS);
       }
     }
 
-    if (dto.username && dto.username !== existingUser.username) {
+    if (
+      updateUserDto.username &&
+      updateUserDto.username !== existingUser.username
+    ) {
       const usernameExists = await this.prisma.user.findUnique({
-        where: { username: dto.username },
+        where: { username: updateUserDto.username },
       });
       if (usernameExists) {
         throw new ConflictException(ERROR_USERNAME_ALREADY_EXISTS);
       }
     }
 
-    const data: Partial<UpdateUserDto> = { ...dto };
+    const data: Partial<UpdateUserDto> = { ...updateUserDto };
 
     if (data.password) {
       data.password = await this.passwordService.hashPassword(data.password);
