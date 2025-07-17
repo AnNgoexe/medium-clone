@@ -94,3 +94,17 @@ export const ERROR_USERNAME_ALREADY_EXISTS = {
   message: 'Username is already in use',
   errorCode: 'ERROR_USERNAME_ALREADY_EXISTS',
 };
+
+export const ERROR_ARTICLE_NOT_FOUND = {
+  statusCode: 404,
+  error: 'Not Found',
+  message: 'Article not found',
+  errorCode: 'ERROR_ARTICLE_NOT_FOUND',
+};
+
+export const ERROR_INVALID_SLUG = {
+  statusCode: 400,
+  error: 'Bad Request',
+  message: 'Slug cannot be empty or invalid',
+  errorCode: 'ERROR_INVALID_SLUG',
+};

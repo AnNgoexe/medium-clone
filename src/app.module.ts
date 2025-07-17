@@ -9,9 +9,10 @@ import LoggerMiddleware from '@common/middleware/logger.middleware';
 import { ConfigModule } from '@config/config.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { UserModule } from '@modules/user/user.module';
+import { ArticleModule } from '@modules/article/article.module';
 
 @Module({
-  imports: [CommonModule, ConfigModule, AuthModule, UserModule],
+  imports: [CommonModule, ConfigModule, AuthModule, UserModule, ArticleModule],
   controllers: [],
   providers: [],
 })
