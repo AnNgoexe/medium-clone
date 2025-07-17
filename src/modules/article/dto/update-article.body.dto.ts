@@ -1,6 +1,6 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateArticleDto {
+export class UpdateArticleBodyDto {
   @IsOptional()
   @IsString({ message: 'Title must be a string' })
   title?: string;

@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -16,9 +17,11 @@ import { ERROR_INVALID_SLUG } from '@common/constant/error.constant';
 import { ResponsePayload } from '@common/type/response.interface';
 import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
-import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
-import { UpdateArticleDto } from '@modules/article/dto/update-article.dto';
+import { CreateArticleBodyDto } from '@modules/article/dto/create-article.body.dto';
+import { UpdateArticleBodyDto } from '@modules/article/dto/update-article.body.dto';
 import { Public } from '@common/decorator/public.decorator';
+import { Optional } from '@common/decorator/optional.decorator';
+import { ListArticlesQueryDto } from '@modules/article/dto/list-articles.query.dto';
 
 @Controller('api/')
 export class ArticleController {
@@ -46,7 +49,7 @@ export class ArticleController {
   @Auth(AuthType.ACCESS_TOKEN)
   async createArticle(
     @Req() req: Request,
-    @Body('article') createArticleDto: CreateArticleDto,
+    @Body('article') createArticleDto: CreateArticleBodyDto,
   ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
     const article = await this.articleService.createArticle(
@@ -80,7 +83,7 @@ export class ArticleController {
   async updateArticle(
     @Req() req: Request,
     @Param('slug') slug: string,
-    @Body('article') updateArticleDto: UpdateArticleDto,
+    @Body('article') updateArticleDto: UpdateArticleBodyDto,
   ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
       throw new BadRequestException(ERROR_INVALID_SLUG);
@@ -95,6 +98,24 @@ export class ArticleController {
     return {
       message: 'Article updated successfully',
       data: article,
+    };
+  }
+
+  @Get('articles')
+  @HttpCode(HttpStatus.OK)
+  @Optional()
+  async listArticles(
+    @Req() req: Request,
+    @Query() listArticlesQueryDto: ListArticlesQueryDto,
+  ): Promise<ResponsePayload> {
+    const userId = req.user?.userId;
+    const articles = await this.articleService.listArticles(
+      userId,
+      listArticlesQueryDto,
+    );
+    return {
+      message: 'Articles retrieved successfully',
+      data: articles,
     };
   }
 }

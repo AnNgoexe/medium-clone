@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import PrismaService from '@common/service/prisma.service';
 import PasswordService from '@common/service/password.service';
-import UpdateUserDto from '@modules/user/update-user.dto';
+import UpdateUserBodyDto from '@modules/user/update-user.body.dto';
 import {
   ERROR_EMAIL_ALREADY_EXISTS,
   ERROR_USER_NOT_FOUND,
@@ -24,7 +24,7 @@ export class UserService {
 
   async updateUser(
     userId: number,
-    updateUserDto: UpdateUserDto,
+    updateUserDto: UpdateUserBodyDto,
   ): Promise<object> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -55,18 +55,11 @@ export class UserService {
       }
     }
 
-    const data: Partial<UpdateUserDto> = { ...updateUserDto };
+    const data: Partial<UpdateUserBodyDto> = { ...updateUserDto };
 
     if (data.password) {
       data.password = await this.passwordService.hashPassword(data.password);
     }
-
-    Object.keys(data).forEach((key) => {
-      const typedKey = key as keyof UpdateUserDto;
-      if (data[typedKey] === undefined || data[typedKey] === null) {
-        delete data[typedKey];
-      }
-    });
 
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },

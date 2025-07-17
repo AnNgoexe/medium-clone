@@ -32,6 +32,7 @@ export default class JwtAuthGuard implements CanActivate {
     const authHeader = request.headers['authorization'];
 
     if (typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
+      if (authType === AuthType.OPTIONAL) return true;
       throw new UnauthorizedException(ERROR_MISSING_AUTH_HEADER);
     }
 
@@ -57,6 +58,7 @@ export default class JwtAuthGuard implements CanActivate {
       request['user'] = payload;
       return true;
     } catch {
+      if (authType === AuthType.OPTIONAL) return true;
       throw new UnauthorizedException('Invalid or expired access token');
     }
   }

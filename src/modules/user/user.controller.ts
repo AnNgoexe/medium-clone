@@ -8,7 +8,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import UpdateUserDto from '@modules/user/update-user.dto';
+import UpdateUserBodyDto from '@modules/user/update-user.body.dto';
 import { ResponsePayload } from '@common/type/response.interface';
 import { Request } from 'express';
 import { AuthType } from '@common/type/auth-type.enum';
@@ -23,7 +23,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async updateCurrentUser(
     @Req() req: Request,
-    @Body('user') updateUserDto: UpdateUserDto,
+    @Body('user') updateUserDto: UpdateUserBodyDto,
   ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
     const updatedUser = await this.userService.updateUser(

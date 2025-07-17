@@ -11,9 +11,10 @@ import {
   ERROR_FORBIDDEN_DELETE_ARTICLE,
   ERROR_FORBIDDEN_UPDATE_ARTICLE,
 } from '@common/constant/error.constant';
-import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
+import { CreateArticleBodyDto } from '@modules/article/dto/create-article.body.dto';
 import slugify from 'slugify';
-import { UpdateArticleDto } from '@modules/article/dto/update-article.dto';
+import { UpdateArticleBodyDto } from '@modules/article/dto/update-article.body.dto';
+import { ListArticlesQueryDto } from '@modules/article/dto/list-articles.query.dto';
 
 @Injectable()
 export class ArticleService {
@@ -74,7 +75,7 @@ export class ArticleService {
 
   async createArticle(
     userId: number,
-    createArticleDto: CreateArticleDto,
+    createArticleDto: CreateArticleBodyDto,
   ): Promise<object> {
     const { title, description, body, tagList = [] } = createArticleDto;
 
@@ -159,7 +160,7 @@ export class ArticleService {
   async updateArticle(
     userId: number,
     slug: string,
-    updateArticleDto: UpdateArticleDto,
+    updateArticleDto: UpdateArticleBodyDto,
   ): Promise<object> {
     const article = await this.prismaService.article.findUnique({
       where: { slug },
@@ -177,7 +178,7 @@ export class ArticleService {
       throw new ForbiddenException(ERROR_FORBIDDEN_UPDATE_ARTICLE);
     }
 
-    const data: Partial<UpdateArticleDto & { slug: string }> = {
+    const data: Partial<UpdateArticleBodyDto & { slug: string }> = {
       ...updateArticleDto,
     };
     if (updateArticleDto.title) {
@@ -227,6 +228,63 @@ export class ArticleService {
           image: updatedArticle.author.image,
         },
       },
+    };
+  }
+
+  async listArticles(
+    userId: number | undefined,
+    query: ListArticlesQueryDto,
+  ): Promise<object> {
+    const { tag, author, favorited, limit = 20, offset = 0 } = query;
+
+    const articles = await this.prismaService.article.findMany({
+      where: {
+        tagList: { some: { name: tag } },
+        author: { username: author },
+        favoritedBy: { some: { username: favorited } },
+      },
+      skip: offset,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true,
+            followers: { select: { id: true } },
+          },
+        },
+        tagList: true,
+        favoritedBy: { select: { id: true } },
+      },
+    });
+
+    const articlesResponse = articles.map((article) => ({
+      slug: article.slug,
+      title: article.title,
+      description: article.description,
+      body: article.body,
+      tagList: article.tagList.map((tag) => tag.name),
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
+      favorited: userId
+        ? article.favoritedBy.some((user) => user.id === userId)
+        : undefined,
+      favoritesCount: article.favoritedBy.length,
+      author: {
+        username: article.author.username,
+        bio: article.author.bio,
+        image: article.author.image,
+        following: userId
+          ? article.author.followers.some((follower) => follower.id === userId)
+          : undefined,
+      },
+    }));
+
+    return {
+      articles: articlesResponse,
+      articlesCount: articlesResponse.length,
     };
   }
 }
