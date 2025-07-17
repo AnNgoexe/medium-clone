@@ -19,7 +19,7 @@ import { UpdateArticleDto } from '@modules/article/dto/update-article.dto';
 export class ArticleService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getArticleBySlug(userId: number, slug: string): Promise<object> {
+  async getArticleBySlug(slug: string): Promise<object> {
     const article = await this.prismaService.article.findUnique({
       where: { slug },
       select: {
@@ -41,7 +41,6 @@ export class ArticleService {
             image: true,
             followers: {
               select: { id: true },
-              where: { id: userId },
             },
           },
         },
@@ -52,8 +51,6 @@ export class ArticleService {
       throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
     }
 
-    const isAuthor = article.author.id === userId;
-
     return {
       article: {
         slug: article.slug,
@@ -63,13 +60,13 @@ export class ArticleService {
         tagList: article.tagList.map((tag) => tag.name),
         createdAt: article.createdAt,
         updatedAt: article.updatedAt,
-        favorited: article.favoritedBy.some((user) => user.id === userId),
+        favorited: false,
         favoritesCount: article.favoritedBy.length,
         author: {
           username: article.author.username,
           bio: article.author.bio,
           image: article.author.image,
-          following: isAuthor ? undefined : article.author.followers.length > 0,
+          following: false,
         },
       },
     };

@@ -18,6 +18,7 @@ import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
 import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
 import { UpdateArticleDto } from '@modules/article/dto/update-article.dto';
+import { Public } from '@common/decorator/public.decorator';
 
 @Controller('api/')
 export class ArticleController {
@@ -25,20 +26,15 @@ export class ArticleController {
 
   @Get('articles/:slug')
   @HttpCode(HttpStatus.OK)
-  @Auth(AuthType.ACCESS_TOKEN)
+  @Public()
   async getArticleBySlug(
-    @Req() req: Request,
     @Param('slug') slug: string,
   ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
       throw new BadRequestException(ERROR_INVALID_SLUG);
     }
 
-    const userId = req.user?.userId;
-    const article = await this.articleService.getArticleBySlug(
-      userId as number,
-      slug,
-    );
+    const article = await this.articleService.getArticleBySlug(slug);
     return {
       message: 'Article retrieved successfully',
       data: article,
