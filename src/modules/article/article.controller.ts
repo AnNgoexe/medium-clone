@@ -17,6 +17,7 @@ import { ResponsePayload } from '@common/type/response.interface';
 import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
 import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
+import { UpdateArticleDto } from '@modules/article/dto/update-article.dto';
 
 @Controller('api/')
 export class ArticleController {
@@ -75,5 +76,29 @@ export class ArticleController {
 
     const userId = req.user?.userId;
     await this.articleService.deleteArticle(userId as number, slug);
+  }
+
+  @Post('articles/:slug')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async updateArticle(
+    @Req() req: Request,
+    @Param('slug') slug: string,
+    @Body('article') updateArticleDto: UpdateArticleDto,
+  ): Promise<ResponsePayload> {
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException(ERROR_INVALID_SLUG);
+    }
+
+    const userId = req.user?.userId;
+    const article = await this.articleService.updateArticle(
+      userId as number,
+      slug,
+      updateArticleDto,
+    );
+    return {
+      message: 'Article updated successfully',
+      data: article,
+    };
   }
 }

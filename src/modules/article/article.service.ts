@@ -9,9 +9,11 @@ import {
   ERROR_ARTICLE_NOT_FOUND,
   ERROR_ARTICLE_CONFLICT,
   ERROR_FORBIDDEN_DELETE_ARTICLE,
+  ERROR_FORBIDDEN_UPDATE_ARTICLE,
 } from '@common/constant/error.constant';
 import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
 import slugify from 'slugify';
+import { UpdateArticleDto } from '@modules/article/dto/update-article.dto';
 
 @Injectable()
 export class ArticleService {
@@ -155,5 +157,79 @@ export class ArticleService {
     await this.prismaService.article.delete({
       where: { slug },
     });
+  }
+
+  async updateArticle(
+    userId: number,
+    slug: string,
+    updateArticleDto: UpdateArticleDto,
+  ): Promise<object> {
+    const article = await this.prismaService.article.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        authorId: true,
+      },
+    });
+
+    if (!article) {
+      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    }
+
+    if (article.authorId !== userId) {
+      throw new ForbiddenException(ERROR_FORBIDDEN_UPDATE_ARTICLE);
+    }
+
+    const data: Partial<UpdateArticleDto & { slug: string }> = {
+      ...updateArticleDto,
+    };
+    if (updateArticleDto.title) {
+      const newSlug = slugify(updateArticleDto.title, { lower: true });
+      if (newSlug !== slug) {
+        const conflictCount = await this.prismaService.article.count({
+          where: { slug: newSlug },
+        });
+
+        if (conflictCount > 0) {
+          throw new ConflictException(ERROR_ARTICLE_CONFLICT);
+        }
+      }
+      data.slug = newSlug;
+    }
+
+    const updatedArticle = await this.prismaService.article.update({
+      where: { slug },
+      data: data,
+      include: {
+        tagList: true,
+        favoritedBy: {
+          select: { id: true },
+        },
+        author: {
+          select: { username: true, bio: true, image: true },
+        },
+      },
+    });
+
+    return {
+      article: {
+        slug: updatedArticle.slug,
+        title: updatedArticle.title,
+        description: updatedArticle.description,
+        body: updatedArticle.body,
+        tagList: updatedArticle.tagList.map((tag) => tag.name),
+        createdAt: updatedArticle.createdAt,
+        updatedAt: updatedArticle.updatedAt,
+        favorited: updatedArticle.favoritedBy.some(
+          (user) => user.id === userId,
+        ),
+        favoritesCount: updatedArticle.favoritedBy.length,
+        author: {
+          username: updatedArticle.author.username,
+          bio: updatedArticle.author.bio,
+          image: updatedArticle.author.image,
+        },
+      },
+    };
   }
 }

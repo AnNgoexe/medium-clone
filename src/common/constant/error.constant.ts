@@ -116,6 +116,13 @@ export const ERROR_FORBIDDEN_DELETE_ARTICLE = {
   errorCode: 'ERROR_FORBIDDEN_DELETE_ARTICLE',
 };
 
+export const ERROR_FORBIDDEN_UPDATE_ARTICLE = {
+  statusCode: 403,
+  error: 'Forbidden',
+  message: 'You are not the author of this article',
+  errorCode: 'ERROR_FORBIDDEN_UPDATE_ARTICLE',
+};
+
 export const ERROR_ARTICLE_CONFLICT = {
   statusCode: 409,
   error: 'Conflict',
