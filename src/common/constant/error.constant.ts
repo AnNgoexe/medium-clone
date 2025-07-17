@@ -129,3 +129,31 @@ export const ERROR_ARTICLE_CONFLICT = {
   message: 'Article with this slug already exists',
   errorCode: 'ERROR_ARTICLE_CONFLICT',
 };
+
+export const ERROR_CANNOT_FOLLOW_SELF = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'You cannot follow yourself.',
+  errorCode: 'ERROR_CANNOT_FOLLOW_SELF',
+};
+
+export const ERROR_ALREADY_FOLLOWING = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'You are already following this user.',
+  errorCode: 'ERROR_ALREADY_FOLLOWING',
+};
+
+export const ERROR_CANNOT_UNFOLLOW_SELF = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'You cannot unfollow yourself.',
+  errorCode: 'ERROR_CANNOT_UNFOLLOW_SELF',
+};
+
+export const ERROR_NOT_FOLLOWING_USER = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'You are not following this user.',
+  errorCode: 'ERROR_NOT_FOLLOWING_USER',
+};

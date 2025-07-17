@@ -55,7 +55,7 @@ model User {
 
   articles    Article[] @relation("UserArticles")
 
-  following   User[]    @relation("FollowRelation")
+  followings  User[]    @relation("FollowRelation")
   followers   User[]    @relation("FollowRelation")
 
   @@map("users")

@@ -14,7 +14,7 @@ export async function seedFollows(): Promise<void> {
     await prisma.user.update({
       where: { id: followerId },
       data: {
-        following: {
+        followings: {
           connect: { id: followingId },
         },
       },
