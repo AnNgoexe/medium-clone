@@ -108,3 +108,17 @@ export const ERROR_INVALID_SLUG = {
   message: 'Slug cannot be empty or invalid',
   errorCode: 'ERROR_INVALID_SLUG',
 };
+
+export const ERROR_FORBIDDEN_DELETE_ARTICLE = {
+  statusCode: 403,
+  error: 'Forbidden',
+  message: 'You are not the author of this article',
+  errorCode: 'ERROR_FORBIDDEN_DELETE_ARTICLE',
+};
+
+export const ERROR_ARTICLE_CONFLICT = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'Article with this slug already exists',
+  errorCode: 'ERROR_ARTICLE_CONFLICT',
+};

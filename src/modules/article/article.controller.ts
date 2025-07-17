@@ -1,10 +1,12 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -13,6 +15,7 @@ import { ERROR_INVALID_SLUG } from '@common/constant/error.constant';
 import { ResponsePayload } from '@common/type/response.interface';
 import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
+import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
 
 @Controller('api/')
 export class ArticleController {
@@ -36,6 +39,24 @@ export class ArticleController {
     );
     return {
       message: 'Article retrieved successfully',
+      data: article,
+    };
+  }
+
+  @Post('articles/')
+  @HttpCode(HttpStatus.CREATED)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async createArticle(
+    @Req() req: Request,
+    @Body('article') createArticleDto: CreateArticleDto,
+  ): Promise<ResponsePayload> {
+    const userId = req.user?.userId;
+    const article = await this.articleService.createArticle(
+      userId as number,
+      createArticleDto,
+    );
+    return {
+      message: 'Article created successfully',
       data: article,
     };
   }
