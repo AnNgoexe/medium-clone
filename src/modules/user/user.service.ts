@@ -105,4 +105,116 @@ export class UserService {
     const token: string = await this.tokenService.generateAccessToken(payload);
     return this.buildUserResponse(user, token);
   }
+
+  async followUser(userId: number, username: string): Promise<object> {
+    const userToFollow = await this.prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+      select: {
+        id: true,
+        username: true,
+        bio: true,
+        image: true,
+      },
+    });
+
+    if (!userToFollow) {
+      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+    }
+
+    if (userToFollow.id === userId) {
+      throw new ConflictException('You cannot follow yourself.');
+    }
+
+    const existingFollow = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        following: {
+          some: {
+            id: userToFollow.id,
+          },
+        },
+      },
+    });
+
+    if (existingFollow) {
+      throw new ConflictException('You are already following this user.');
+    }
+
+    await this.prisma.user.update({
+      data: {
+        following: {
+          connect: { id: userToFollow.id },
+        },
+      },
+      where: { id: userId },
+    });
+
+    return {
+      message: `You are now following ${userToFollow.username}.`,
+      data: {
+        username: userToFollow.username,
+        bio: userToFollow.bio,
+        image: userToFollow.image,
+        following: true,
+      },
+    };
+  }
+
+  async unfollowUser(userId: number, username: string): Promise<object> {
+    const userToUnfollow = await this.prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+      select: {
+        id: true,
+        username: true,
+        bio: true,
+        image: true,
+      },
+    });
+
+    if (!userToUnfollow) {
+      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+    }
+
+    if (userToUnfollow.id === userId) {
+      throw new ConflictException('You cannot unfollow yourself.');
+    }
+
+    const existingFollow = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        following: {
+          some: {
+            id: userToUnfollow.id,
+          },
+        },
+      },
+    });
+
+    if (!existingFollow) {
+      throw new ConflictException('You are not following this user.');
+    }
+
+    await this.prisma.user.update({
+      data: {
+        following: {
+          disconnect: { id: userToUnfollow.id },
+        },
+      },
+      where: { id: userId },
+    });
+
+    return {
+      message: `You have unfollowed ${userToUnfollow.username}.`,
+      data: {
+        username: userToUnfollow.username,
+        bio: userToUnfollow.bio,
+        image: userToUnfollow.image,
+        following: false,
+      },
+    };
+  }
 }
