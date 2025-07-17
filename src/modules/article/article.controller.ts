@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -59,5 +60,20 @@ export class ArticleController {
       message: 'Article created successfully',
       data: article,
     };
+  }
+
+  @Delete('articles/:slug')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async deleteArticle(
+    @Req() req: Request,
+    @Param('slug') slug: string,
+  ): Promise<void> {
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException(ERROR_INVALID_SLUG);
+    }
+
+    const userId = req.user?.userId;
+    await this.articleService.deleteArticle(userId as number, slug);
   }
 }

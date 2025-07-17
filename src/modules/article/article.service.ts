@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,6 +8,7 @@ import PrismaService from '@common/service/prisma.service';
 import {
   ERROR_ARTICLE_NOT_FOUND,
   ERROR_ARTICLE_CONFLICT,
+  ERROR_FORBIDDEN_DELETE_ARTICLE,
 } from '@common/constant/error.constant';
 import { CreateArticleDto } from '@modules/article/dto/create-article.dto';
 import slugify from 'slugify';
@@ -131,5 +133,27 @@ export class ArticleService {
         },
       },
     };
+  }
+
+  async deleteArticle(userId: number, slug: string): Promise<void> {
+    const article = await this.prismaService.article.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        authorId: true,
+      },
+    });
+
+    if (!article) {
+      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    }
+
+    if (article.authorId !== userId) {
+      throw new ForbiddenException(ERROR_FORBIDDEN_DELETE_ARTICLE);
+    }
+
+    await this.prismaService.article.delete({
+      where: { slug },
+    });
   }
 }
