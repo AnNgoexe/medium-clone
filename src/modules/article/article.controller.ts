@@ -30,9 +30,7 @@ export class ArticleController {
   @Get('articles/:slug')
   @HttpCode(HttpStatus.OK)
   @Public()
-  async getArticleBySlug(
-    @Param('slug') slug: string,
-  ): Promise<ResponsePayload> {
+  async getBySlug(@Param('slug') slug: string): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
       throw new BadRequestException(ERROR_INVALID_SLUG);
     }
@@ -47,7 +45,7 @@ export class ArticleController {
   @Post('articles/')
   @HttpCode(HttpStatus.CREATED)
   @Auth(AuthType.ACCESS_TOKEN)
-  async createArticle(
+  async create(
     @Req() req: Request,
     @Body('article') createArticleDto: CreateArticleBodyDto,
   ): Promise<ResponsePayload> {
@@ -65,7 +63,7 @@ export class ArticleController {
   @Delete('articles/:slug')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Auth(AuthType.ACCESS_TOKEN)
-  async deleteArticle(
+  async delete(
     @Req() req: Request,
     @Param('slug') slug: string,
   ): Promise<void> {
@@ -80,7 +78,7 @@ export class ArticleController {
   @Post('articles/:slug')
   @HttpCode(HttpStatus.OK)
   @Auth(AuthType.ACCESS_TOKEN)
-  async updateArticle(
+  async update(
     @Req() req: Request,
     @Param('slug') slug: string,
     @Body('article') updateArticleDto: UpdateArticleBodyDto,
@@ -104,7 +102,7 @@ export class ArticleController {
   @Get('articles')
   @HttpCode(HttpStatus.OK)
   @Optional()
-  async listArticles(
+  async list(
     @Req() req: Request,
     @Query() listArticlesQueryDto: ListArticlesQueryDto,
   ): Promise<ResponsePayload> {

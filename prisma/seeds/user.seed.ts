@@ -28,19 +28,21 @@ export async function seedUsers(): Promise<void> {
     },
   ];
 
-  for (const user of users) {
-    const hashedPassword = await bcrypt.hash(user.password, 10);
+  const usersHashed = await Promise.all(
+    users.map(async (user) => ({
+      ...user,
+      password: await bcrypt.hash(user.password, 10),
+    }))
+  );
 
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: {},
-      create: {
-        email: user.email,
-        username: user.username,
-        password: hashedPassword,
-        bio: user.bio,
-        image: user.image,
-      },
-    });
-  }
+  await prisma.user.createMany({
+    data: usersHashed.map(({ email, username, password, bio, image }) => ({
+      email,
+      username,
+      password,
+      bio,
+      image,
+    })),
+    skipDuplicates: true,
+  });
 }

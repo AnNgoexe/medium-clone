@@ -13,6 +13,7 @@ import {
   ERROR_USER_ALREADY_EXISTS,
 } from '@common/constant/error.constant';
 import { AccessTokenPayloadInput } from '@common/type/token-payload.interface';
+import { User, UserResponse } from '@common/type/user-response.interface';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,19 @@ export class AuthService {
     return this.tokenService.generateAccessToken(payload);
   }
 
-  async validateUser(email: string, password: string): Promise<object> {
+  private buildUserResponse(user: User, token: string): UserResponse {
+    return {
+      user: {
+        email: user.email,
+        username: user.username,
+        bio: user.bio || null,
+        image: user.image || null,
+        token,
+      },
+    };
+  }
+
+  async validateUser(email: string, password: string): Promise<UserResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email },
       select: {
@@ -58,22 +71,14 @@ export class AuthService {
       throw new UnauthorizedException(ERROR_PASSWORD_INVALID);
     }
     const token = await this.createAccessToken(user);
-    return {
-      user: {
-        email: user.email,
-        username: user.username,
-        bio: user.bio || null,
-        image: user.image || null,
-        token,
-      },
-    };
+    return this.buildUserResponse(user, token);
   }
 
   async register(
     username: string,
     email: string,
     password: string,
-  ): Promise<object> {
+  ): Promise<UserResponse> {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ email }, { username }],
@@ -91,16 +96,15 @@ export class AuthService {
         bio: '',
         image: '',
       },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        bio: true,
+        image: true,
+      },
     });
     const token = await this.createAccessToken(user);
-    return {
-      user: {
-        email: user.email,
-        username: user.username,
-        bio: user.bio || null,
-        image: user.image || null,
-        token,
-      },
-    };
+    return this.buildUserResponse(user, token);
   }
 }

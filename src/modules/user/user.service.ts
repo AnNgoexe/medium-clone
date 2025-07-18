@@ -13,6 +13,7 @@ import {
 } from '@common/constant/error.constant';
 import TokenService from '@common/service/token.service';
 import { AccessTokenPayloadInput } from '@common/type/token-payload.interface';
+import { User, UserResponse } from '@common/type/user-response.interface';
 
 @Injectable()
 export class UserService {
@@ -22,10 +23,22 @@ export class UserService {
     private readonly tokenService: TokenService,
   ) {}
 
+  private buildUserResponse(user: User, token: string): UserResponse {
+    return {
+      user: {
+        email: user.email,
+        username: user.username,
+        bio: user.bio || null,
+        image: user.image || null,
+        token,
+      },
+    };
+  }
+
   async updateUser(
     userId: number,
     updateUserDto: UpdateUserBodyDto,
-  ): Promise<object> {
+  ): Promise<UserResponse> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -72,17 +85,10 @@ export class UserService {
       email: updatedUser.email,
     };
     const token: string = await this.tokenService.generateAccessToken(payload);
-
-    return {
-      email: updatedUser.email,
-      username: updatedUser.username,
-      bio: updatedUser.bio,
-      image: updatedUser.image,
-      token,
-    };
+    return this.buildUserResponse(updatedUser, token);
   }
 
-  async getCurrentUser(userId: number): Promise<object> {
+  async getCurrentUser(userId: number): Promise<UserResponse> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -97,13 +103,6 @@ export class UserService {
       email: user.email,
     };
     const token: string = await this.tokenService.generateAccessToken(payload);
-
-    return {
-      email: user.email,
-      username: user.username,
-      bio: user.bio,
-      image: user.image,
-      token,
-    };
+    return this.buildUserResponse(user, token);
   }
 }
