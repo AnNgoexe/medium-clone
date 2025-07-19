@@ -10,9 +10,17 @@ import { ConfigModule } from '@config/config.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { UserModule } from '@modules/user/user.module';
 import { ArticleModule } from '@modules/article/article.module';
+import { CommentModule } from '@modules/comment/comment.module';
 
 @Module({
-  imports: [CommonModule, ConfigModule, AuthModule, UserModule, ArticleModule],
+  imports: [
+    CommonModule,
+    ConfigModule,
+    AuthModule,
+    CommentModule,
+    UserModule,
+    ArticleModule,
+  ],
   controllers: [],
   providers: [],
 })
