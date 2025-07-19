@@ -95,6 +95,20 @@ export const ERROR_USERNAME_ALREADY_EXISTS = {
   errorCode: 'ERROR_USERNAME_ALREADY_EXISTS',
 };
 
+export const ERROR_COMMENT_NOT_FOUND = {
+  statusCode: 404,
+  error: 'Not Found',
+  message: 'Comment not found',
+  errorCode: 'ERROR_COMMENT_NOT_FOUND',
+};
+
+export const ERROR_FORBIDDEN_DELETE_COMMENT = {
+  statusCode: 403,
+  error: 'Forbidden',
+  message: 'You are not the author of this comment',
+  errorCode: 'ERROR_FORBIDDEN_DELETE_COMMENT',
+};
+
 export const ERROR_ARTICLE_NOT_FOUND = {
   statusCode: 404,
   error: 'Not Found',
