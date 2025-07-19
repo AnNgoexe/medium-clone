@@ -52,7 +52,7 @@ export class ProfileController {
   }
 
   @Auth(AuthType.ACCESS_TOKEN)
-  @Delete('profiles/:username/follow')
+  @Delete('profiles/:username/unfollow')
   @HttpCode(HttpStatus.OK)
   async unfollowUser(
     @Req() req: Request,
