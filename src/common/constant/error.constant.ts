@@ -88,6 +88,20 @@ export const ERROR_EMAIL_ALREADY_EXISTS = {
   errorCode: 'ERROR_EMAIL_ALREADY_EXISTS',
 };
 
+export const ERROR_ALREADY_FAVORITED = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'You have already favorited this article',
+  errorCode: 'ERROR_ALREADY_FAVORITED',
+};
+
+export const ERROR_NOT_FAVORITED_YET = {
+  statusCode: 409,
+  error: 'Conflict',
+  message: 'You have not favorited this article yet',
+  errorCode: 'ERROR_NOT_FAVORITED_YET',
+};
+
 export const ERROR_USERNAME_ALREADY_EXISTS = {
   statusCode: 409,
   error: 'Conflict',

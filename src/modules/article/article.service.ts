@@ -10,6 +10,8 @@ import {
   ERROR_ARTICLE_CONFLICT,
   ERROR_FORBIDDEN_DELETE_ARTICLE,
   ERROR_FORBIDDEN_UPDATE_ARTICLE,
+  ERROR_ALREADY_FAVORITED,
+  ERROR_NOT_FAVORITED_YET,
 } from '@common/constant/error.constant';
 import { CreateArticleBodyDto } from '@modules/article/dto/create-article.body.dto';
 import { UpdateArticleBodyDto } from '@modules/article/dto/update-article.body.dto';
@@ -207,6 +209,93 @@ export class ArticleService {
       articles: articlesResponse,
       articlesCount: articlesResponse.length,
     };
+  }
+
+  async favoriteArticle(
+    userId: number,
+    slug: string,
+  ): Promise<SingleArticleResponse> {
+    const article = await this.prismaService.article.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        favoritedBy: { select: { id: true } },
+      },
+    });
+
+    if (!article) {
+      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    }
+
+    const alreadyFavorited = article.favoritedBy.some(
+      (user) => user.id === userId,
+    );
+    if (alreadyFavorited) {
+      throw new ConflictException(ERROR_ALREADY_FAVORITED);
+    }
+
+    const updatedArticle = await this.prismaService.article.update({
+      where: { id: article.id },
+      data: { favoritedBy: { connect: { id: userId } } },
+      include: {
+        favoritedBy: true,
+        tagList: true,
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true,
+            followers: { select: { id: true } },
+          },
+        },
+      },
+    });
+
+    return { article: this.buildArticleResponse(updatedArticle, userId) };
+  }
+
+  async unfavoriteArticle(
+    userId: number,
+    slug: string,
+  ): Promise<SingleArticleResponse> {
+    const article = await this.prismaService.article.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        favoritedBy: { select: { id: true } },
+      },
+    });
+
+    if (!article) {
+      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    }
+
+    const alreadyFavorited = article.favoritedBy.some(
+      (user) => user.id === userId,
+    );
+
+    if (!alreadyFavorited) {
+      throw new ConflictException(ERROR_NOT_FAVORITED_YET);
+    }
+
+    const updatedArticle = await this.prismaService.article.update({
+      where: { id: article.id },
+      data: { favoritedBy: { disconnect: { id: userId } } },
+      include: {
+        favoritedBy: true,
+        tagList: true,
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true,
+            followers: { select: { id: true } },
+          },
+        },
+      },
+    });
+
+    return { article: this.buildArticleResponse(updatedArticle, userId) };
   }
 
   private buildArticleResponse(

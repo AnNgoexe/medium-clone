@@ -116,4 +116,42 @@ export class ArticleController {
       data: articles,
     };
   }
+
+  @Post('articles/:slug/favorite')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async favorite(
+    @Req() req: Request,
+    @Param('slug') slug: string,
+  ): Promise<ResponsePayload> {
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException(ERROR_INVALID_SLUG);
+    }
+
+    const userId = req.user?.userId as number;
+    const article = await this.articleService.favoriteArticle(userId, slug);
+    return {
+      message: 'Article favorited successfully',
+      data: article,
+    };
+  }
+
+  @Delete('articles/:slug/unfavorite')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async unfavorite(
+    @Req() req: Request,
+    @Param('slug') slug: string,
+  ): Promise<ResponsePayload> {
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException(ERROR_INVALID_SLUG);
+    }
+
+    const userId = req.user?.userId as number;
+    const article = await this.articleService.unfavoriteArticle(userId, slug);
+    return {
+      message: 'Article unfavorited successfully',
+      data: article,
+    };
+  }
 }
