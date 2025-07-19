@@ -3,13 +3,6 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-/**
- * Seed initial user data into the database.
- *
- * This function inserts a predefined list of users into the database.
- * If a user with the same email already exists, it will skip creating a new user.
- * Passwords are securely hashed using bcrypt before being stored.
- */
 export async function seedUsers(): Promise<void> {
   const users = [
     {
