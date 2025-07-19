@@ -23,24 +23,13 @@ export class UserService {
     private readonly tokenService: TokenService,
   ) {}
 
-  private buildUserResponse(user: User, token: string): UserResponse {
-    return {
-      user: {
-        email: user.email,
-        username: user.username,
-        bio: user.bio || null,
-        image: user.image || null,
-        token,
-      },
-    };
-  }
-
   async updateUser(
     userId: number,
     updateUserDto: UpdateUserBodyDto,
   ): Promise<UserResponse> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
+      select: { email: true, username: true },
     });
 
     if (!existingUser) {
@@ -51,9 +40,7 @@ export class UserService {
       const emailExists = await this.prisma.user.findUnique({
         where: { email: updateUserDto.email },
       });
-      if (emailExists) {
-        throw new ConflictException(ERROR_EMAIL_ALREADY_EXISTS);
-      }
+      if (emailExists) throw new ConflictException(ERROR_EMAIL_ALREADY_EXISTS);
     }
 
     if (
@@ -63,13 +50,11 @@ export class UserService {
       const usernameExists = await this.prisma.user.findUnique({
         where: { username: updateUserDto.username },
       });
-      if (usernameExists) {
+      if (usernameExists)
         throw new ConflictException(ERROR_USERNAME_ALREADY_EXISTS);
-      }
     }
 
-    const data: Partial<UpdateUserBodyDto> = { ...updateUserDto };
-
+    const data = updateUserDto;
     if (data.password) {
       data.password = await this.passwordService.hashPassword(data.password);
     }
@@ -77,32 +62,48 @@ export class UserService {
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data,
+      select: { id: true, email: true, username: true, bio: true, image: true },
     });
 
-    const payload: AccessTokenPayloadInput = {
-      userId: updatedUser.id,
-      username: updatedUser.username,
-      email: updatedUser.email,
-    };
-    const token: string = await this.tokenService.generateAccessToken(payload);
+    const token: string = await this.createAccessToken(updatedUser);
     return this.buildUserResponse(updatedUser, token);
   }
 
   async getCurrentUser(userId: number): Promise<UserResponse> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
+      select: { id: true, email: true, username: true, bio: true, image: true },
     });
 
-    if (!user) {
-      throw new NotFoundException(ERROR_USER_NOT_FOUND);
-    }
+    if (!user) throw new NotFoundException(ERROR_USER_NOT_FOUND);
 
+    const token: string = await this.createAccessToken(user);
+    return this.buildUserResponse(user, token);
+  }
+
+  private buildUserResponse(
+    user: Omit<User, 'id' | 'password'>,
+    token: string,
+  ): UserResponse {
+    return {
+      user: {
+        email: user.email,
+        username: user.username,
+        bio: user.bio || '',
+        image: user.image || '',
+        token,
+      },
+    };
+  }
+
+  private async createAccessToken(
+    user: Pick<User, 'email' | 'id' | 'username'>,
+  ): Promise<string> {
     const payload: AccessTokenPayloadInput = {
       userId: user.id,
       username: user.username,
       email: user.email,
     };
-    const token: string = await this.tokenService.generateAccessToken(payload);
-    return this.buildUserResponse(user, token);
+    return this.tokenService.generateAccessToken(payload);
   }
 }

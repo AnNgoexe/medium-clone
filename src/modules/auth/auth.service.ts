@@ -23,31 +23,6 @@ export class AuthService {
     private readonly passwordService: PasswordService,
   ) {}
 
-  private async createAccessToken(user: {
-    id: number;
-    username: string;
-    email: string;
-  }): Promise<string> {
-    const payload: AccessTokenPayloadInput = {
-      userId: user.id,
-      username: user.username,
-      email: user.email,
-    };
-    return this.tokenService.generateAccessToken(payload);
-  }
-
-  private buildUserResponse(user: User, token: string): UserResponse {
-    return {
-      user: {
-        email: user.email,
-        username: user.username,
-        bio: user.bio || null,
-        image: user.image || null,
-        token,
-      },
-    };
-  }
-
   async validateUser(email: string, password: string): Promise<UserResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -60,16 +35,15 @@ export class AuthService {
         image: true,
       },
     });
-    if (!user) {
-      throw new NotFoundException(ERROR_USER_NOT_FOUND);
-    }
+    if (!user) throw new NotFoundException(ERROR_USER_NOT_FOUND);
+
     const isPasswordValid = await this.passwordService.comparePassword(
       password,
       user.password,
     );
-    if (!isPasswordValid) {
+    if (!isPasswordValid)
       throw new UnauthorizedException(ERROR_PASSWORD_INVALID);
-    }
+
     const token = await this.createAccessToken(user);
     return this.buildUserResponse(user, token);
   }
@@ -80,13 +54,11 @@ export class AuthService {
     password: string,
   ): Promise<UserResponse> {
     const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
+      where: { OR: [{ email }, { username }] },
+      select: { id: true },
     });
-    if (existingUser) {
-      throw new ConflictException(ERROR_USER_ALREADY_EXISTS);
-    }
+    if (existingUser) throw new ConflictException(ERROR_USER_ALREADY_EXISTS);
+
     const hashedPassword = await this.passwordService.hashPassword(password);
     const user = await this.prisma.user.create({
       data: {
@@ -96,15 +68,35 @@ export class AuthService {
         bio: '',
         image: '',
       },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        bio: true,
-        image: true,
-      },
+      select: { id: true, email: true, username: true, bio: true, image: true },
     });
     const token = await this.createAccessToken(user);
     return this.buildUserResponse(user, token);
+  }
+
+  private async createAccessToken(
+    user: Pick<User, 'email' | 'id' | 'username'>,
+  ): Promise<string> {
+    const payload: AccessTokenPayloadInput = {
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    return this.tokenService.generateAccessToken(payload);
+  }
+
+  private buildUserResponse(
+    user: Omit<User, 'id' | 'password'>,
+    token: string,
+  ): UserResponse {
+    return {
+      user: {
+        email: user.email,
+        username: user.username,
+        bio: user.bio || '',
+        image: user.image || '',
+        token,
+      },
+    };
   }
 }

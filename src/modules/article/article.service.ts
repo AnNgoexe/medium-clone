@@ -54,9 +54,7 @@ export class ArticleService {
       },
     });
 
-    if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
-    }
+    if (!article) throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
 
     return { article: this.buildArticleResponse(article) };
   }
@@ -72,9 +70,7 @@ export class ArticleService {
       where: { slug },
       select: { id: true },
     });
-    if (existing) {
-      throw new ConflictException(ERROR_ARTICLE_CONFLICT);
-    }
+    if (existing) throw new ConflictException(ERROR_ARTICLE_CONFLICT);
 
     const article = await this.prismaService.article.create({
       data: {
@@ -99,7 +95,7 @@ export class ArticleService {
             followers: { select: { id: true } },
           },
         },
-        tagList: true,
+        tagList: { select: { name: true } },
         favoritedBy: { select: { id: true } },
       },
     });
@@ -110,19 +106,13 @@ export class ArticleService {
   async deleteArticle(userId: number, slug: string): Promise<void> {
     const article = await this.prismaService.article.findUnique({
       where: { slug },
-      select: {
-        id: true,
-        authorId: true,
-      },
+      select: { id: true, authorId: true },
     });
 
-    if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
-    }
+    if (!article) throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
 
-    if (article.authorId !== userId) {
+    if (article.authorId !== userId)
       throw new ForbiddenException(ERROR_FORBIDDEN_DELETE_ARTICLE);
-    }
 
     await this.prismaService.article.delete({
       where: { slug },
@@ -139,27 +129,21 @@ export class ArticleService {
       select: { id: true, authorId: true },
     });
 
-    if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
-    }
+    if (!article) throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
 
-    if (article.authorId !== userId) {
+    if (article.authorId !== userId)
       throw new ForbiddenException(ERROR_FORBIDDEN_UPDATE_ARTICLE);
-    }
 
-    const data: Partial<UpdateArticleBodyDto & { slug: string }> = {
-      ...updateArticleDto,
-    };
+    const data: Partial<UpdateArticleBodyDto & { slug: string }> =
+      updateArticleDto;
     if (updateArticleDto.title) {
       const newSlug = slugify(updateArticleDto.title, { lower: true });
       if (newSlug !== slug) {
         const conflictCount = await this.prismaService.article.count({
           where: { slug: newSlug },
         });
-
-        if (conflictCount > 0) {
+        if (conflictCount > 0)
           throw new ConflictException(ERROR_ARTICLE_CONFLICT);
-        }
       }
       data.slug = newSlug;
     }
@@ -168,7 +152,7 @@ export class ArticleService {
       where: { slug },
       data: data,
       include: {
-        tagList: true,
+        tagList: { select: { name: true } },
         favoritedBy: { select: { id: true } },
         author: {
           select: {
@@ -210,7 +194,7 @@ export class ArticleService {
             followers: { select: { id: true } },
           },
         },
-        tagList: true,
+        tagList: { select: { name: true } },
         favoritedBy: { select: { id: true } },
       },
     });
@@ -239,7 +223,7 @@ export class ArticleService {
       updatedAt: article.updatedAt,
       favorited: userId
         ? article.favoritedBy.some((user) => user.id === userId)
-        : false,
+        : undefined,
       favoritesCount: article.favoritedBy.length,
       author: {
         username: article.author.username,
@@ -247,7 +231,7 @@ export class ArticleService {
         image: article.author.image,
         following: userId
           ? article.author.followers.some((follower) => follower.id === userId)
-          : false,
+          : undefined,
       },
     };
   }

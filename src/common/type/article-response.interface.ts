@@ -33,13 +33,13 @@ export interface ArticleResponseData {
   tagList: string[];
   createdAt: Date;
   updatedAt: Date;
-  favorited: boolean;
+  favorited?: boolean;
   favoritesCount: number;
   author: {
     username: string;
     bio: string | null;
     image: string | null;
-    following: boolean;
+    following?: boolean;
   };
 }
 

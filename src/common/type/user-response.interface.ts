@@ -8,11 +8,5 @@ export interface User {
 }
 
 export interface UserResponse {
-  user: {
-    email: string;
-    username: string;
-    bio: string | null;
-    image: string | null;
-    token: string;
-  };
+  user: Omit<User, 'id'> & { token: string };
 }
