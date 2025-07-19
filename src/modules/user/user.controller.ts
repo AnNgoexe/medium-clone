@@ -6,9 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Get,
-  Param,
-  Post,
-  Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import UpdateUserBodyDto from '@modules/user/update-user.body.dto';
@@ -48,42 +45,6 @@ export class UserController {
     return {
       message: 'User retrieved successfully',
       data: user,
-    };
-  }
-
-  @Auth(AuthType.ACCESS_TOKEN)
-  @Post('profiles/:username/follow')
-  @HttpCode(HttpStatus.OK)
-  async followUser(
-    @Req() req: Request,
-    @Param('username') username: string,
-  ): Promise<ResponsePayload> {
-    const userId = req.user?.userId;
-    const result = await this.userService.followUser(
-      userId as number,
-      username,
-    );
-    return {
-      message: 'Followed user successfully',
-      data: result,
-    };
-  }
-
-  @Auth(AuthType.ACCESS_TOKEN)
-  @Delete('profiles/:username/follow')
-  @HttpCode(HttpStatus.OK)
-  async unfollowUser(
-    @Req() req: Request,
-    @Param('username') username: string,
-  ): Promise<ResponsePayload> {
-    const userId = req.user?.userId;
-    const result = await this.userService.unfollowUser(
-      userId as number,
-      username,
-    );
-    return {
-      message: 'Unfollowed user successfully',
-      data: result,
     };
   }
 }

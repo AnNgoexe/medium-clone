@@ -1,0 +1,23 @@
+export interface Profile {
+  id: number;
+
+  username: string;
+
+  bio: string | null;
+
+  image: string | null;
+}
+
+export interface ProfileResponseData {
+  username: string;
+
+  bio: string | null;
+
+  image: string | null;
+
+  following?: boolean;
+}
+
+export interface ProfileResponse {
+  profile: ProfileResponseData;
+}
