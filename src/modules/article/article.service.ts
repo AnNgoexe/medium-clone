@@ -21,40 +21,14 @@ import {
   MutlipleArticleResponse,
 } from '@common/type/article-response.interface';
 import slugify from 'slugify';
-
-const DEFAULT_LIMIT = 20;
-const DEFAULT_OFFSET = 0;
+import {
+  ARTICLE_PAGINATION_DEFAULT_LIMIT,
+  ARTICLE_PAGINATION_DEFAULT_OFFSET,
+} from '@common/constant/pagination.constant';
 
 @Injectable()
 export class ArticleService {
   constructor(private readonly prismaService: PrismaService) {}
-
-  private buildArticleResponse(
-    article: Article,
-    userId?: number,
-  ): ArticleResponseData {
-    return {
-      slug: article.slug,
-      title: article.title,
-      description: article.description,
-      body: article.body,
-      tagList: article.tagList.map((tag) => tag.name),
-      createdAt: article.createdAt,
-      updatedAt: article.updatedAt,
-      favorited: userId
-        ? article.favoritedBy.some((user) => user.id === userId)
-        : false,
-      favoritesCount: article.favoritedBy.length,
-      author: {
-        username: article.author.username,
-        bio: article.author.bio,
-        image: article.author.image,
-        following: userId
-          ? article.author.followers.some((follower) => follower.id === userId)
-          : false,
-      },
-    };
-  }
 
   async getArticleBySlug(slug: string): Promise<SingleArticleResponse> {
     const article = await this.prismaService.article.findUnique({
@@ -215,8 +189,8 @@ export class ArticleService {
     query: ListArticlesQueryDto,
   ): Promise<MutlipleArticleResponse> {
     const { tag, author, favorited } = query;
-    const LIMIT = query.limit ?? DEFAULT_LIMIT;
-    const OFFSET = query.offset ?? DEFAULT_OFFSET;
+    const limit = query.limit ?? ARTICLE_PAGINATION_DEFAULT_LIMIT;
+    const offset = query.offset ?? ARTICLE_PAGINATION_DEFAULT_OFFSET;
 
     const articles = await this.prismaService.article.findMany({
       where: {
@@ -224,8 +198,8 @@ export class ArticleService {
         author: { username: author },
         favoritedBy: { some: { username: favorited } },
       },
-      skip: OFFSET,
-      take: LIMIT,
+      skip: offset,
+      take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
         author: {
@@ -248,6 +222,33 @@ export class ArticleService {
     return {
       articles: articlesResponse,
       articlesCount: articlesResponse.length,
+    };
+  }
+
+  private buildArticleResponse(
+    article: Article,
+    userId?: number,
+  ): ArticleResponseData {
+    return {
+      slug: article.slug,
+      title: article.title,
+      description: article.description,
+      body: article.body,
+      tagList: article.tagList.map((tag) => tag.name),
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
+      favorited: userId
+        ? article.favoritedBy.some((user) => user.id === userId)
+        : false,
+      favoritesCount: article.favoritedBy.length,
+      author: {
+        username: article.author.username,
+        bio: article.author.bio,
+        image: article.author.image,
+        following: userId
+          ? article.author.followers.some((follower) => follower.id === userId)
+          : false,
+      },
     };
   }
 }
