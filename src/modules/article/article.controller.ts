@@ -66,13 +66,18 @@ export class ArticleController {
   async delete(
     @Req() req: Request,
     @Param('slug') slug: string,
-  ): Promise<void> {
+  ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
       throw new BadRequestException(ERROR_INVALID_SLUG);
     }
 
     const userId = req.user?.userId;
     await this.articleService.deleteArticle(userId as number, slug);
+
+    return {
+      message: 'Delete article successfully',
+      data: {},
+    };
   }
 
   @Post('articles/:slug')
