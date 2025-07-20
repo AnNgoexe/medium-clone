@@ -17,7 +17,7 @@ import CreateCommentBodyDto from '@modules/comment/create-comment.body.dto';
 import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
 
-@Controller('articles/:slug')
+@Controller('api/articles/:slug')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
@@ -30,7 +30,7 @@ export class CommentController {
     @Body('comment') createCommentBodyDto: CreateCommentBodyDto,
   ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
-    const { comment: body } = createCommentBodyDto;
+    const { body } = createCommentBodyDto;
 
     const comment = await this.commentService.createComment(
       userId as number,
@@ -62,13 +62,18 @@ export class CommentController {
 
   @Delete('comments/:id')
   @Auth(AuthType.ACCESS_TOKEN)
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteComment(
     @Req() req: Request,
     @Param('slug') slug: string,
     @Param('id', ParseIntPipe) commentId: number,
-  ): Promise<void> {
+  ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
     await this.commentService.deleteComment(userId as number, slug, commentId);
+
+    return {
+      message: 'Delete comment successfully',
+      data: {},
+    };
   }
 }

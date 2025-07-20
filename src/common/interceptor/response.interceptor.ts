@@ -29,6 +29,7 @@ export default class ResponseInterceptor<T extends ResponsePayload>
         return formatted;
       }),
       catchError((error: unknown) => {
+        console.log(error);
         this.logger.error(`[${method}] ${url} - Error thrown`);
         return throwError(() => error); // Re-throw to let ExceptionFilter handle it
       }),
