@@ -111,7 +111,10 @@ export class CommentService {
         username: comment.author.username,
         bio: comment.author.bio || '',
         image: comment.author.image || '',
-        following: userId ? followingSet.has(comment.author.id) : undefined,
+        following:
+          userId && userId !== comment.author.id
+            ? followingSet.has(comment.author.id)
+            : undefined,
       },
     }));
 
