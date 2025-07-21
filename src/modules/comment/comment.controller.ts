@@ -23,7 +23,7 @@ export class CommentController {
 
   @HttpCode(HttpStatus.CREATED)
   @Auth(AuthType.ACCESS_TOKEN)
-  @Post('comments/')
+  @Post('comments')
   async createComment(
     @Req() req: Request,
     @Param('slug') slug: string,
@@ -44,7 +44,7 @@ export class CommentController {
     };
   }
 
-  @Get('comments/')
+  @Get('comments')
   @HttpCode(HttpStatus.OK)
   @Auth(AuthType.OPTIONAL)
   async getComments(
