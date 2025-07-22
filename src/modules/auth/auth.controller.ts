@@ -4,10 +4,14 @@ import LoginBodyDto from './dto/login.body.dto';
 import { ResponsePayload } from '@common/type/response.interface';
 import { Public } from '@common/decorator/public.decorator';
 import RegisterBodyDto from '@modules/auth/dto/register.body.dto';
+import { I18nService } from 'nestjs-i18n';
 
 @Controller('api')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @Post('/users/login')
   @Public()
@@ -17,7 +21,7 @@ export class AuthController {
     const user = await this.authService.validateUser(email, password);
 
     return {
-      message: 'Login successful',
+      message: this.i18n.translate('auth.login.success'),
       data: user,
     };
   }
@@ -32,7 +36,7 @@ export class AuthController {
     const user = await this.authService.register(username, email, password);
 
     return {
-      message: 'Register successful',
+      message: this.i18n.translate('auth.register.success'),
       data: user,
     };
   }

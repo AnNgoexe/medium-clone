@@ -1,0 +1,19 @@
+{
+  "get": {
+    "error": "{{username}}のプロフィールが見つかりませんでした。"
+  },
+  "follow": {
+    "error": {
+      "cannot_follow_self": "自分自身をフォローすることはできません。",
+      "already_following": "このユーザーをすでにフォローしています。"
+    },
+    "success": "{{username}}をフォローしました！"
+  },
+  "unfollow": {
+    "error": {
+      "cannot_unfollow_self": "自分自身をアンフォローすることはできません。",
+      "not_following_user": "このユーザーをフォローしていません。"
+    },
+    "success": "{{username}}のフォローを解除しました。"
+  }
+}

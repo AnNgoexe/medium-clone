@@ -14,6 +14,7 @@ import {
 } from '@common/constant/error.constant';
 import { AccessTokenPayloadInput } from '@common/type/token-payload.interface';
 import { User, UserResponse } from '@common/type/user-response.interface';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly tokenService: TokenService,
     private readonly passwordService: PasswordService,
+    private readonly i18n: I18nService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<UserResponse> {
@@ -35,14 +37,21 @@ export class AuthService {
         image: true,
       },
     });
-    if (!user) throw new NotFoundException(ERROR_USER_NOT_FOUND);
+    if (!user)
+      throw new NotFoundException({
+        ...ERROR_USER_NOT_FOUND,
+        message: this.i18n.translate('auth.login.error.user_not_exists'),
+      });
 
     const isPasswordValid = await this.passwordService.comparePassword(
       password,
       user.password,
     );
     if (!isPasswordValid)
-      throw new UnauthorizedException(ERROR_PASSWORD_INVALID);
+      throw new UnauthorizedException({
+        ...ERROR_PASSWORD_INVALID,
+        message: this.i18n.translate('auth.login.error.password_not_match'),
+      });
 
     const token = await this.createAccessToken(user);
     return this.buildUserResponse(user, token);
@@ -57,7 +66,11 @@ export class AuthService {
       where: { OR: [{ email }, { username }] },
       select: { id: true },
     });
-    if (existingUser) throw new ConflictException(ERROR_USER_ALREADY_EXISTS);
+    if (existingUser)
+      throw new ConflictException({
+        ...ERROR_USER_ALREADY_EXISTS,
+        message: this.i18n.translate('auth.register.error.user_already_exists'),
+      });
 
     const hashedPassword = await this.passwordService.hashPassword(password);
     const user = await this.prisma.user.create({
