@@ -9,11 +9,31 @@
     "error_missing_user_name": "Thông tin người dùng không đầy đủ. Vui lòng đăng nhập lại.",
     "error_missing_user_email": "Thông tin người dùng không đầy đủ. Vui lòng đăng nhập lại.",
     "email_isEmail": "Email không hợp lệ, vui lòng nhập đúng định dạng email",
+    "email_isNotEmpty": "Email không được để trống.",
     "username_isString": "Tên người dùng phải là một chuỗi ký tự",
+    "username_isNotEmpty": "Tên người dùng không được để trống.",
     "password_isString": "Mật khẩu phải là một chuỗi ký tự",
+    "password_isNotEmpty": "Mật khẩu không được để trống.",
     "password_minLength": "Mật khẩu cần có ít nhất 6 ký tự",
     "password_matches": "Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt",
     "bio_isString": "Tiểu sử phải là một chuỗi ký tự",
-    "image_isUrl": "Ảnh đại diện phải là một URL hợp lệ"
+    "image_isUrl": "Ảnh đại diện phải là một URL hợp lệ",
+
+    "title_isNotEmpty": "Vui lòng nhập tiêu đề.",
+    "title_isString": "Tiêu đề phải là văn bản.",
+    "description_isNotEmpty": "Vui lòng nhập mô tả.",
+    "description_isString": "Mô tả phải là văn bản.",
+    "body_isNotEmpty": "Vui lòng nhập nội dung.",
+    "body_isString": "Nội dung phải là văn bản.",
+    "tagList_isArray": "Danh sách thẻ phải là một mảng.",
+    "tagList_each_isString": "Mỗi thẻ phải là văn bản.",
+
+    "tag_isString": "Thẻ phải là văn bản.",
+    "author_isString": "Tác giả phải được chỉ định là văn bản.",
+    "favorited_isString": "Trường yêu thích phải là văn bản.",
+    "limit_isInt": "Giới hạn phải là số nguyên.",
+    "limit_min": "Giới hạn không được nhỏ hơn 0.",
+    "offset_isInt": "Độ lệch phải là số nguyên.",
+    "offset_min": "Độ lệch không được nhỏ hơn 0."
   }
 }

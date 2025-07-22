@@ -27,10 +27,14 @@ import {
   ARTICLE_PAGINATION_DEFAULT_LIMIT,
   ARTICLE_PAGINATION_DEFAULT_OFFSET,
 } from '@common/constant/pagination.constant';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ArticleService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly i18n: I18nService,
+  ) {}
 
   async getArticleBySlug(slug: string): Promise<SingleArticleResponse> {
     const article = await this.prismaService.article.findUnique({
@@ -56,7 +60,11 @@ export class ArticleService {
       },
     });
 
-    if (!article) throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    if (!article)
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.get.error'),
+      });
 
     return { article: this.buildArticleResponse(article) };
   }
@@ -72,7 +80,11 @@ export class ArticleService {
       where: { slug },
       select: { id: true },
     });
-    if (existing) throw new ConflictException(ERROR_ARTICLE_CONFLICT);
+    if (existing)
+      throw new ConflictException({
+        ...ERROR_ARTICLE_CONFLICT,
+        message: this.i18n.translate('article.create.error'),
+      });
 
     const article = await this.prismaService.article.create({
       data: {
@@ -111,10 +123,17 @@ export class ArticleService {
       select: { id: true, authorId: true },
     });
 
-    if (!article) throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    if (!article)
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.delete.error.not_found'),
+      });
 
     if (article.authorId !== userId)
-      throw new ForbiddenException(ERROR_FORBIDDEN_DELETE_ARTICLE);
+      throw new ForbiddenException({
+        ...ERROR_FORBIDDEN_DELETE_ARTICLE,
+        message: this.i18n.translate('article.delete.error.forbidden'),
+      });
 
     await this.prismaService.article.delete({
       where: { slug },
@@ -131,10 +150,17 @@ export class ArticleService {
       select: { id: true, authorId: true },
     });
 
-    if (!article) throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+    if (!article)
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.update.error.not_found'),
+      });
 
     if (article.authorId !== userId)
-      throw new ForbiddenException(ERROR_FORBIDDEN_UPDATE_ARTICLE);
+      throw new ForbiddenException({
+        ...ERROR_FORBIDDEN_UPDATE_ARTICLE,
+        message: this.i18n.translate('article.update.error.forbidden'),
+      });
 
     const data: Partial<UpdateArticleBodyDto & { slug: string }> =
       updateArticleDto;
@@ -145,7 +171,10 @@ export class ArticleService {
           where: { slug: newSlug },
         });
         if (conflictCount > 0)
-          throw new ConflictException(ERROR_ARTICLE_CONFLICT);
+          throw new ConflictException({
+            ...ERROR_ARTICLE_CONFLICT,
+            message: this.i18n.translate('article.update.error.conflict'),
+          });
       }
       data.slug = newSlug;
     }
@@ -224,14 +253,22 @@ export class ArticleService {
     });
 
     if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.favorite.error.not_found'),
+      });
     }
 
     const alreadyFavorited = article.favoritedBy.some(
       (user) => user.id === userId,
     );
     if (alreadyFavorited) {
-      throw new ConflictException(ERROR_ALREADY_FAVORITED);
+      throw new ConflictException({
+        ...ERROR_ALREADY_FAVORITED,
+        message: this.i18n.translate(
+          'article.favorite.error.already_favorited',
+        ),
+      });
     }
 
     const updatedArticle = await this.prismaService.article.update({
@@ -267,7 +304,10 @@ export class ArticleService {
     });
 
     if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.unfavorite.error.not_found'),
+      });
     }
 
     const alreadyFavorited = article.favoritedBy.some(
@@ -275,7 +315,12 @@ export class ArticleService {
     );
 
     if (!alreadyFavorited) {
-      throw new ConflictException(ERROR_NOT_FAVORITED_YET);
+      throw new ConflictException({
+        ...ERROR_NOT_FAVORITED_YET,
+        message: this.i18n.translate(
+          'article.unfavorite.error.not_favorited_yet',
+        ),
+      });
     }
 
     const updatedArticle = await this.prismaService.article.update({

@@ -1,0 +1,45 @@
+{
+  "get": {
+    "success": "Lấy bài viết thành công.",
+    "error": "Không thể tìm thấy bài viết."
+  },
+  "create": {
+    "success": "Tạo bài viết thành công.",
+    "error": "Đã tồn tại một bài viết với tiêu đề này."
+  },
+  "update": {
+    "success": "Cập nhật bài viết thành công.",
+    "error": {
+      "not_found": "Bài viết bạn muốn cập nhật không tồn tại.",
+      "forbidden": "Bạn không có quyền cập nhật bài viết này.",
+      "conflict": "Đã tồn tại một bài viết với tiêu đề mới."
+    }
+  },
+  "delete": {
+    "success": "Xóa bài viết thành công.",
+    "error": {
+      "not_found": "Bài viết bạn muốn xóa không tồn tại.",
+      "forbidden": "Bạn không có quyền xóa bài viết này."
+    }
+  },
+  "list": {
+    "success": "Lấy danh sách bài viết thành công."
+  },
+  "favorite": {
+    "success": "Đã thêm bài viết vào mục yêu thích.",
+    "error": {
+      "not_found": "Bài viết bạn muốn yêu thích không tồn tại.",
+      "already_favorited": "Bạn đã yêu thích bài viết này rồi."
+    }
+  },
+  "unfavorite": {
+    "success": "Đã bỏ yêu thích bài viết.",
+    "error": {
+      "not_found": "Bài viết bạn muốn bỏ yêu thích không tồn tại.",
+      "not_favorited_yet": "Bạn chưa yêu thích bài viết này."
+    }
+  },
+  "error": {
+    "bad_slug": "Slug của bài viết không hợp lệ."
+  }
+}

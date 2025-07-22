@@ -22,22 +22,29 @@ import { UpdateArticleBodyDto } from '@modules/article/dto/update-article.body.d
 import { Public } from '@common/decorator/public.decorator';
 import { Optional } from '@common/decorator/optional.decorator';
 import { ListArticlesQueryDto } from '@modules/article/dto/list-articles.query.dto';
+import { I18nService } from 'nestjs-i18n';
 
 @Controller('api/')
 export class ArticleController {
-  constructor(private readonly articleService: ArticleService) {}
+  constructor(
+    private readonly articleService: ArticleService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @Get('articles/:slug')
   @HttpCode(HttpStatus.OK)
   @Public()
   async getBySlug(@Param('slug') slug: string): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
-      throw new BadRequestException(ERROR_INVALID_SLUG);
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
     }
 
     const article = await this.articleService.getArticleBySlug(slug);
     return {
-      message: 'Article retrieved successfully',
+      message: this.i18n.translate('article.get.success'),
       data: article,
     };
   }
@@ -55,7 +62,7 @@ export class ArticleController {
       createArticleDto,
     );
     return {
-      message: 'Article created successfully',
+      message: this.i18n.translate('article.create.success'),
       data: article,
     };
   }
@@ -68,14 +75,17 @@ export class ArticleController {
     @Param('slug') slug: string,
   ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
-      throw new BadRequestException(ERROR_INVALID_SLUG);
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
     }
 
     const userId = req.user?.userId;
     await this.articleService.deleteArticle(userId as number, slug);
 
     return {
-      message: 'Delete article successfully',
+      message: this.i18n.translate('article.delete.success'),
       data: {},
     };
   }
@@ -89,7 +99,10 @@ export class ArticleController {
     @Body('article') updateArticleDto: UpdateArticleBodyDto,
   ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
-      throw new BadRequestException(ERROR_INVALID_SLUG);
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
     }
 
     const userId = req.user?.userId;
@@ -99,7 +112,7 @@ export class ArticleController {
       updateArticleDto,
     );
     return {
-      message: 'Article updated successfully',
+      message: this.i18n.translate('article.update.success'),
       data: article,
     };
   }
@@ -117,7 +130,7 @@ export class ArticleController {
       listArticlesQueryDto,
     );
     return {
-      message: 'Articles retrieved successfully',
+      message: this.i18n.translate('article.list.success'),
       data: articles,
     };
   }
@@ -130,13 +143,16 @@ export class ArticleController {
     @Param('slug') slug: string,
   ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
-      throw new BadRequestException(ERROR_INVALID_SLUG);
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
     }
 
     const userId = req.user?.userId as number;
     const article = await this.articleService.favoriteArticle(userId, slug);
     return {
-      message: 'Article favorited successfully',
+      message: this.i18n.translate('article.favorite.success'),
       data: article,
     };
   }
@@ -149,13 +165,16 @@ export class ArticleController {
     @Param('slug') slug: string,
   ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
-      throw new BadRequestException(ERROR_INVALID_SLUG);
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
     }
 
     const userId = req.user?.userId as number;
     const article = await this.articleService.unfavoriteArticle(userId, slug);
     return {
-      message: 'Article unfavorited successfully',
+      message: this.i18n.translate('article.unfavorite.success'),
       data: article,
     };
   }

@@ -1,0 +1,45 @@
+{
+  "get": {
+    "success": "Article retrieved successfully.",
+    "error": "The article could not be found."
+  },
+  "create": {
+    "success": "Article created successfully.",
+    "error": "An article with the same title already exists."
+  },
+  "update": {
+    "success": "Article updated successfully.",
+    "error": {
+      "not_found": "The article you are trying to update does not exist.",
+      "forbidden": "You are not allowed to update this article.",
+      "conflict": "An article with the updated title already exists."
+    }
+  },
+  "delete": {
+    "success": "Article deleted successfully.",
+    "error": {
+      "not_found": "The article you are trying to delete does not exist.",
+      "forbidden": "You are not allowed to delete this article."
+    }
+  },
+  "list": {
+    "success": "Articles retrieved successfully."
+  },
+  "favorite": {
+    "success": "Article favorited successfully.",
+    "error": {
+      "not_found": "The article you want to favorite does not exist.",
+      "already_favorited": "You have already favorited this article."
+    }
+  },
+  "unfavorite": {
+    "success": "Article unfavorited successfully.",
+    "error": {
+      "not_found": "The article you want to unfavorite does not exist.",
+      "not_favorited_yet": "You haven't favorited this article yet."
+    }
+  },
+  "error": {
+    "bad_slug": "The provided article slug is invalid."
+  }
+}

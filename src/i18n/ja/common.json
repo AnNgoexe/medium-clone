@@ -9,11 +9,31 @@
     "error_missing_user_name": "ユーザー情報が不完全です。もう一度ログインしてください。",
     "error_missing_user_email": "ユーザー情報が不完全です。もう一度ログインしてください。",
     "email_isEmail": "メールアドレスが無効です。有効なメールアドレスを入力してください",
+    "email_isNotEmpty": "メールアドレスは必須です。",
     "username_isString": "ユーザー名は文字列である必要があります",
+    "username_isNotEmpty": "ユーザー名は必須です。",
     "password_isString": "パスワードは文字列である必要があります",
+    "password_isNotEmpty": "パスワードは必須です。",
     "password_minLength": "パスワードは6文字以上である必要があります",
     "password_matches": "パスワードには大文字、小文字、数字、特殊文字を含める必要があります",
     "bio_isString": "プロフィールは文字列である必要があります",
-    "image_isUrl": "プロフィール画像は有効なURLである必要があります"
+    "image_isUrl": "プロフィール画像は有効なURLである必要があります",
+
+    "title_isNotEmpty": "タイトルを入力してください。",
+    "title_isString": "タイトルはテキストである必要があります。",
+    "description_isNotEmpty": "説明を入力してください。",
+    "description_isString": "説明はテキストである必要があります。",
+    "body_isNotEmpty": "本文を入力してください。",
+    "body_isString": "本文はテキストである必要があります。",
+    "tagList_isArray": "タグはリスト形式である必要があります。",
+    "tagList_each_isString": "各タグはテキストである必要があります。",
+
+    "tag_isString": "タグはテキストである必要があります。",
+    "author_isString": "著者はテキストで指定する必要があります。",
+    "favorited_isString": "お気に入りフィールドはテキストである必要があります。",
+    "limit_isInt": "制限は整数である必要があります。",
+    "limit_min": "制限は0未満にできません。",
+    "offset_isInt": "オフセットは整数である必要があります。",
+    "offset_min": "オフセットは0未満にできません。"
   }
 }
