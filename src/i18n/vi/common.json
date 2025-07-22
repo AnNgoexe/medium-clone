@@ -1,0 +1,19 @@
+{
+  "error": {
+    "internal_server_error": "Ôi! Có lỗi xảy ra. Vui lòng thử lại sau.",
+    "error_access_token_expired": "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.",
+    "error_invalid_access_token": "Phiên đăng nhập của bạn không hợp lệ. Vui lòng đăng nhập lại.",
+    "error_unknown_access_token": "Không thể xác minh phiên đăng nhập của bạn. Vui lòng đăng nhập lại.",
+    "error_missing_auth_header": "Thông tin xác thực bị thiếu hoặc không chính xác.",
+    "error_missing_user_id": "Thông tin người dùng không đầy đủ. Vui lòng đăng nhập lại.",
+    "error_missing_user_name": "Thông tin người dùng không đầy đủ. Vui lòng đăng nhập lại.",
+    "error_missing_user_email": "Thông tin người dùng không đầy đủ. Vui lòng đăng nhập lại.",
+    "email_isEmail": "Email không hợp lệ, vui lòng nhập đúng định dạng email",
+    "username_isString": "Tên người dùng phải là một chuỗi ký tự",
+    "password_isString": "Mật khẩu phải là một chuỗi ký tự",
+    "password_minLength": "Mật khẩu cần có ít nhất 6 ký tự",
+    "password_matches": "Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt",
+    "bio_isString": "Tiểu sử phải là một chuỗi ký tự",
+    "image_isUrl": "Ảnh đại diện phải là một URL hợp lệ"
+  }
+}

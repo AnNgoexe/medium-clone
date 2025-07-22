@@ -12,6 +12,7 @@ import {
   ERROR_INVALID_ACCESS_TOKEN,
   ERROR_UNKNOWN_ACCESS_TOKEN,
 } from '@common/constant/error.constant';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export default class TokenService {
@@ -21,6 +22,7 @@ export default class TokenService {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly i18n: I18nService,
   ) {
     const jwtConfig = this.configService.get<JwtConfig>('jwt');
     if (!jwtConfig) {
@@ -50,12 +52,25 @@ export default class TokenService {
       });
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        throw new UnauthorizedException(ERROR_ACCESS_TOKEN_EXPIRED);
+        throw new UnauthorizedException({
+          ...ERROR_ACCESS_TOKEN_EXPIRED,
+          message: this.i18n.translate(
+            'common.error.error_access_token_expired',
+          ),
+        });
       }
       if (error instanceof jwt.JsonWebTokenError) {
-        throw new UnauthorizedException(ERROR_INVALID_ACCESS_TOKEN);
+        throw new UnauthorizedException({
+          ...ERROR_INVALID_ACCESS_TOKEN,
+          message: this.i18n.translate(
+            'common.error.error_invalid_access_token',
+          ),
+        });
       }
-      throw new UnauthorizedException(ERROR_UNKNOWN_ACCESS_TOKEN);
+      throw new UnauthorizedException({
+        ...ERROR_UNKNOWN_ACCESS_TOKEN,
+        message: this.i18n.translate('common.error.error_unknown_access_token'),
+      });
     }
   }
 }

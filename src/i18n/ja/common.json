@@ -1,0 +1,19 @@
+{
+  "error": {
+    "internal_server_error": "おっと！何か問題が発生しました。後でもう一度お試しください。",
+    "error_access_token_expired": "セッションが期限切れです。もう一度ログインしてください。",
+    "error_invalid_access_token": "セッションが無効です。もう一度ログインしてください。",
+    "error_unknown_access_token": "セッションを検証できませんでした。もう一度ログインしてください。",
+    "error_missing_auth_header": "認証情報が欠落しているか正しくありません。",
+    "error_missing_user_id": "ユーザー情報が不完全です。もう一度ログインしてください。",
+    "error_missing_user_name": "ユーザー情報が不完全です。もう一度ログインしてください。",
+    "error_missing_user_email": "ユーザー情報が不完全です。もう一度ログインしてください。",
+    "email_isEmail": "メールアドレスが無効です。有効なメールアドレスを入力してください",
+    "username_isString": "ユーザー名は文字列である必要があります",
+    "password_isString": "パスワードは文字列である必要があります",
+    "password_minLength": "パスワードは6文字以上である必要があります",
+    "password_matches": "パスワードには大文字、小文字、数字、特殊文字を含める必要があります",
+    "bio_isString": "プロフィールは文字列である必要があります",
+    "image_isUrl": "プロフィール画像は有効なURLである必要があります"
+  }
+}

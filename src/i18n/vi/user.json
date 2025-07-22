@@ -1,0 +1,14 @@
+{
+  "update": {
+    "success": "Cập nhật thông tin người dùng thành công",
+    "error": {
+      "user_not_found": "Không tìm thấy người dùng",
+      "email_already_exists": "Email này đã được sử dụng",
+      "username_already_exists": "Tên người dùng này đã được sử dụng"
+    }
+  },
+  "get": {
+    "success": "Lấy thông tin người dùng thành công",
+    "error": "Không tìm thấy người dùng"
+  }
+}

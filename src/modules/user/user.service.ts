@@ -14,6 +14,7 @@ import {
 import TokenService from '@common/service/token.service';
 import { AccessTokenPayloadInput } from '@common/type/token-payload.interface';
 import { User, UserResponse } from '@common/type/user-response.interface';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,7 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
+    private readonly i18n: I18nService,
   ) {}
 
   async updateUser(
@@ -33,14 +35,23 @@ export class UserService {
     });
 
     if (!existingUser) {
-      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_USER_NOT_FOUND,
+        message: this.i18n.translate('user.update.error.user_not_found'),
+      });
     }
 
     if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
       const emailExists = await this.prisma.user.findUnique({
         where: { email: updateUserDto.email },
       });
-      if (emailExists) throw new ConflictException(ERROR_EMAIL_ALREADY_EXISTS);
+      if (emailExists)
+        throw new ConflictException({
+          ...ERROR_EMAIL_ALREADY_EXISTS,
+          message: this.i18n.translate(
+            'user.update.error.email_already_exists',
+          ),
+        });
     }
 
     if (
@@ -51,7 +62,12 @@ export class UserService {
         where: { username: updateUserDto.username },
       });
       if (usernameExists)
-        throw new ConflictException(ERROR_USERNAME_ALREADY_EXISTS);
+        throw new ConflictException({
+          ...ERROR_USERNAME_ALREADY_EXISTS,
+          message: this.i18n.translate(
+            'user.update.error.username_already_exists',
+          ),
+        });
     }
 
     const data = updateUserDto;
@@ -75,7 +91,11 @@ export class UserService {
       select: { id: true, email: true, username: true, bio: true, image: true },
     });
 
-    if (!user) throw new NotFoundException(ERROR_USER_NOT_FOUND);
+    if (!user)
+      throw new NotFoundException({
+        ...ERROR_USER_NOT_FOUND,
+        message: this.i18n.translate('user.get.error'),
+      });
 
     const token: string = await this.createAccessToken(user);
     return this.buildUserResponse(user, token);

@@ -1,0 +1,14 @@
+{
+  "update": {
+    "success": "ユーザー情報の更新に成功しました",
+    "error": {
+      "user_not_found": "ユーザーが見つかりませんでした",
+      "email_already_exists": "このメールアドレスはすでに使用されています",
+      "username_already_exists": "このユーザー名はすでに使用されています"
+    }
+  },
+  "get": {
+    "success": "ユーザー情報の取得に成功しました",
+    "error": "ユーザーが見つかりませんでした"
+  }
+}

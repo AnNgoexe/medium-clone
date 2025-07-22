@@ -1,0 +1,14 @@
+{
+  "update": {
+    "success": "User information updated successfully",
+    "error": {
+      "user_not_found": "User not found",
+      "email_already_exists": "This email is already in use",
+      "username_already_exists": "This username is already in use"
+    }
+  },
+  "get": {
+    "success": "User information retrieved successfully",
+    "error": "User not found"
+  }
+}

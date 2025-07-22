@@ -1,0 +1,19 @@
+{
+  "error": {
+    "internal_server_error": "Oops! Something went wrong. Please try again later.",
+    "error_access_token_expired": "Your session has expired. Please log in again.",
+    "error_invalid_access_token": "Your session is invalid. Please log in again.",
+    "error_unknown_access_token": "Unable to verify your session. Please log in again.",
+    "error_missing_auth_header": "Authorization information is missing or incorrect.",
+    "error_missing_user_id": "User information is incomplete. Please log in again.",
+    "error_missing_user_name": "User information is incomplete. Please log in again.",
+    "error_missing_user_email": "User information is incomplete. Please log in again.",
+    "email_isEmail": "Invalid email, please enter a valid email address",
+    "username_isString": "Username must be a string",
+    "password_isString": "Password must be a string",
+    "password_minLength": "Password must be at least 6 characters long",
+    "password_matches": "Password must include uppercase letters, lowercase letters, numbers, and special characters",
+    "bio_isString": "Bio must be a string",
+    "image_isUrl": "Profile picture must be a valid URL"
+  }
+}

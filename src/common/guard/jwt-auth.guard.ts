@@ -11,12 +11,14 @@ import { UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { AUTH_TYPE_KEY } from '@common/decorator/auth.decorator';
 import { AuthType } from '@common/type/auth-type.enum';
+import { I18nService, I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export default class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly tokenService: TokenService,
     private readonly reflector: Reflector,
+    private readonly i18n: I18nService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -29,11 +31,19 @@ export default class JwtAuthGuard implements CanActivate {
     }
 
     const request: Request = context.switchToHttp().getRequest<Request>();
+    const i18nContext = I18nContext.current(context);
+    const lang = i18nContext?.lang || 'en';
+
     const authHeader = request.headers['authorization'];
 
     if (typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
       if (authType === AuthType.OPTIONAL) return true;
-      throw new UnauthorizedException(ERROR_MISSING_AUTH_HEADER);
+      throw new UnauthorizedException({
+        ...ERROR_MISSING_AUTH_HEADER,
+        message: this.i18n.translate('common.error.error_missing_auth_header', {
+          lang,
+        }),
+      });
     }
 
     const token = authHeader.split(' ')[1];
@@ -44,22 +54,38 @@ export default class JwtAuthGuard implements CanActivate {
       const { userId, username, email } = payload;
 
       if (!userId) {
-        throw new UnauthorizedException(ERROR_MISSING_USER_ID);
+        throw new UnauthorizedException({
+          ...ERROR_MISSING_USER_ID,
+          message: this.i18n.translate('common.error.error_missing_user_id', {
+            lang,
+          }),
+        });
       }
 
       if (!username) {
-        throw new UnauthorizedException(ERROR_MISSING_USER_NAME);
+        throw new UnauthorizedException({
+          ...ERROR_MISSING_USER_NAME,
+          message: this.i18n.translate('common.error.error_missing_user_name', {
+            lang,
+          }),
+        });
       }
 
       if (!email) {
-        throw new UnauthorizedException(ERROR_MISSING_USER_EMAIL);
+        throw new UnauthorizedException({
+          ...ERROR_MISSING_USER_EMAIL,
+          message: this.i18n.translate(
+            'common.error.error_missing_user_email',
+            { lang },
+          ),
+        });
       }
 
       request['user'] = payload;
       return true;
-    } catch {
+    } catch (error) {
       if (authType === AuthType.OPTIONAL) return true;
-      throw new UnauthorizedException('Invalid or expired access token');
+      throw error;
     }
   }
 }

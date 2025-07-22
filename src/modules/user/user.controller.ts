@@ -13,10 +13,14 @@ import { ResponsePayload } from '@common/type/response.interface';
 import { Request } from 'express';
 import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
+import { I18nService } from 'nestjs-i18n';
 
 @Controller('api')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @Auth(AuthType.ACCESS_TOKEN)
   @Put('user')
@@ -31,7 +35,7 @@ export class UserController {
       updateUserDto,
     );
     return {
-      message: 'User updated successfully',
+      message: this.i18n.translate('user.update.success'),
       data: updatedUser,
     };
   }
@@ -43,7 +47,7 @@ export class UserController {
     const userId = req.user?.userId;
     const user = await this.userService.getCurrentUser(userId as number);
     return {
-      message: 'User retrieved successfully',
+      message: this.i18n.translate('user.get.success'),
       data: user,
     };
   }
