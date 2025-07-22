@@ -1,0 +1,15 @@
+{
+  "create": {
+    "success": "Tạo bình luận thành công."
+  },
+  "list": {
+    "success": "Lấy danh sách bình luận thành công."
+  },
+  "delete": {
+    "success": "Xoá bình luận thành công.",
+    "error": {
+      "comment_not_found": "Không tìm thấy bình luận.",
+      "forbidden": "Bạn không có quyền xoá bình luận này."
+    }
+  }
+}

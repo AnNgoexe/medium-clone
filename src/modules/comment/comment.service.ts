@@ -13,10 +13,14 @@ import {
   MultipleCommentResponse,
   SingleCommentResponse,
 } from '@common/type/comment-response.interface';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly i18n: I18nService,
+  ) {}
 
   async createComment(
     userId: number,
@@ -28,7 +32,10 @@ export class CommentService {
       select: { id: true },
     });
     if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.get.error'),
+      });
     }
 
     const comment = await this.prisma.comment.create({
@@ -84,7 +91,10 @@ export class CommentService {
       },
     });
     if (!article) {
-      throw new NotFoundException(ERROR_ARTICLE_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_ARTICLE_NOT_FOUND,
+        message: this.i18n.translate('article.get.error'),
+      });
     }
 
     let followingSet = new Set<number>();
@@ -139,11 +149,17 @@ export class CommentService {
     });
 
     if (!comment) {
-      throw new NotFoundException(ERROR_COMMENT_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_COMMENT_NOT_FOUND,
+        message: this.i18n.translate('comment.delete.error.comment_not_found'),
+      });
     }
 
     if (comment.authorId !== userId) {
-      throw new ForbiddenException(ERROR_FORBIDDEN_DELETE_COMMENT);
+      throw new ForbiddenException({
+        ...ERROR_FORBIDDEN_DELETE_COMMENT,
+        message: this.i18n.translate('comment.delete.error.forbidden'),
+      });
     }
 
     await this.prisma.comment.delete({

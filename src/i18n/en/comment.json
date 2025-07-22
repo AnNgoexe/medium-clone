@@ -1,0 +1,15 @@
+{
+  "create": {
+    "success": "Get comment successfully."
+  },
+  "list": {
+    "success": "List comments successfully."
+  },
+  "delete": {
+    "success": "Delete comment successfully.",
+    "error": {
+      "comment_not_found": "Comment not found.",
+      "forbidden": "You are not allowed to delete this comment."
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -16,10 +17,15 @@ import { CommentService } from '@modules/comment/comment.service';
 import CreateCommentBodyDto from '@modules/comment/create-comment.body.dto';
 import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
+import { I18nService } from 'nestjs-i18n';
+import { ERROR_INVALID_SLUG } from '@common/constant/error.constant';
 
 @Controller('api/articles/:slug')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(
+    private readonly commentService: CommentService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Auth(AuthType.ACCESS_TOKEN)
@@ -32,6 +38,13 @@ export class CommentController {
     const userId = req.user?.userId;
     const { body } = createCommentBodyDto;
 
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
+    }
+
     const comment = await this.commentService.createComment(
       userId as number,
       body,
@@ -39,7 +52,7 @@ export class CommentController {
     );
 
     return {
-      message: 'Comment created successfully',
+      message: this.i18n.translate('comment.create.success'),
       data: comment,
     };
   }
@@ -53,9 +66,16 @@ export class CommentController {
   ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
 
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
+    }
+
     const comments = await this.commentService.getComments(userId, slug);
     return {
-      message: 'Get comments successfully',
+      message: this.i18n.translate('comment.list.success'),
       data: comments,
     };
   }
@@ -69,10 +89,17 @@ export class CommentController {
     @Param('id', ParseIntPipe) commentId: number,
   ): Promise<ResponsePayload> {
     const userId = req.user?.userId;
+    if (!slug || slug.trim() === '') {
+      throw new BadRequestException({
+        ...ERROR_INVALID_SLUG,
+        message: this.i18n.translate('article.error.bad_slug'),
+      });
+    }
+
     await this.commentService.deleteComment(userId as number, slug, commentId);
 
     return {
-      message: 'Delete comment successfully',
+      message: this.i18n.translate('comment.delete.success'),
       data: {},
     };
   }
