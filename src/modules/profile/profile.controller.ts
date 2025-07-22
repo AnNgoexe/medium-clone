@@ -13,10 +13,14 @@ import { Request } from 'express';
 import { Auth } from '@common/decorator/auth.decorator';
 import { AuthType } from '@common/type/auth-type.enum';
 import { ResponsePayload } from '@common/type/response.interface';
+import { I18nService } from 'nestjs-i18n';
 
 @Controller('api')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly i18n: I18nService,
+  ) {}
 
   @Get('profiles/:username')
   @Auth(AuthType.OPTIONAL)
@@ -46,7 +50,9 @@ export class ProfileController {
     const userId = req.user?.userId as number;
     const profile = await this.profileService.followUser(userId, username);
     return {
-      message: 'Followed user successfully',
+      message: this.i18n.translate('profile.follow.success', {
+        args: { username },
+      }),
       data: profile,
     };
   }
@@ -61,7 +67,9 @@ export class ProfileController {
     const userId = req.user?.userId as number;
     const profile = await this.profileService.unfollowUser(userId, username);
     return {
-      message: 'Unfollowed user successfully',
+      message: this.i18n.translate('profile.unfollow.success.', {
+        args: { username },
+      }),
       data: profile,
     };
   }

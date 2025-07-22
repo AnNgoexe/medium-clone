@@ -1,0 +1,19 @@
+{
+  "get": {
+    "error": "Cannot find the {{username}}'s profile."
+  },
+  "follow": {
+    "error": {
+      "cannot_follow_self": "You cannot follow yourself.",
+      "already_following": "You are already following this user."
+    },
+    "success": "You are now following {{username}}!"
+  },
+  "unfollow": {
+    "error": {
+      "cannot_unfollow_self": "You cannot unfollow yourself.",
+      "not_following_user": "You are not following this user."
+    },
+    "success": "You have unfollowed {{username}}."
+  }
+}

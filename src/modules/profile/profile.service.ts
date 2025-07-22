@@ -16,10 +16,14 @@ import {
   ProfileResponse,
   Profile,
 } from '@common/type/profile-response.interface';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly i18n: I18nService,
+  ) {}
 
   async getProfile(
     currentUserId: number | undefined,
@@ -31,7 +35,12 @@ export class ProfileService {
     });
 
     if (!user) {
-      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_USER_NOT_FOUND,
+        message: this.i18n.translate('profile.get.error', {
+          args: { username },
+        }),
+      });
     }
 
     const { id, ...profile } = user;
@@ -60,12 +69,22 @@ export class ProfileService {
       select: { id: true, username: true, bio: true, image: true },
     });
     if (!userToUnfollow) {
-      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_USER_NOT_FOUND,
+        message: this.i18n.translate('profile.get.error', {
+          args: { username },
+        }),
+      });
     }
 
     const { id, ...profile } = userToUnfollow;
     if (id === userId) {
-      throw new ConflictException(ERROR_CANNOT_UNFOLLOW_SELF);
+      throw new ConflictException({
+        ...ERROR_CANNOT_UNFOLLOW_SELF,
+        message: this.i18n.translate(
+          'profile.unfollow.error.cannot_unfollow_self',
+        ),
+      });
     }
 
     const isFollowing = await this.prisma.user.count({
@@ -75,7 +94,12 @@ export class ProfileService {
       },
     });
     if (isFollowing === 0) {
-      throw new ConflictException(ERROR_NOT_FOLLOWING_USER);
+      throw new ConflictException({
+        ...ERROR_NOT_FOLLOWING_USER,
+        message: this.i18n.translate(
+          'profile.unfollow.error.not_following_user',
+        ),
+      });
     }
 
     await this.prisma.user.update({
@@ -95,12 +119,18 @@ export class ProfileService {
       select: { id: true, username: true, bio: true, image: true },
     });
     if (!userToFollow) {
-      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+      throw new NotFoundException({
+        ...ERROR_USER_NOT_FOUND,
+        message: this.i18n.translate('profile.get.error'),
+      });
     }
 
     const { id, ...profile } = userToFollow;
     if (id === userId) {
-      throw new ConflictException(ERROR_CANNOT_FOLLOW_SELF);
+      throw new ConflictException({
+        ...ERROR_CANNOT_FOLLOW_SELF,
+        message: this.i18n.translate('profile.follow.error.cannot_follow_self'),
+      });
     }
 
     const isAlreadyFollowing = await this.prisma.user.count({
@@ -110,7 +140,10 @@ export class ProfileService {
       },
     });
     if (isAlreadyFollowing > 0) {
-      throw new ConflictException(ERROR_ALREADY_FOLLOWING);
+      throw new ConflictException({
+        ...ERROR_ALREADY_FOLLOWING,
+        message: this.i18n.translate('profile.follow.error.already_following'),
+      });
     }
 
     await this.prisma.user.update({
