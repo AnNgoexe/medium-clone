@@ -36,15 +36,29 @@ export class ArticleService {
     private readonly i18n: I18nService,
   ) {}
 
-  async getArticleBySlug(slug: string): Promise<SingleArticleResponse> {
-    const article = await this.prismaService.article.findUnique({
-      where: { slug },
+  async getArticleBySlug(
+    slug: string,
+    currentUserId: number | undefined,
+  ): Promise<SingleArticleResponse> {
+    const article = await this.prismaService.article.findFirst({
+      where: {
+        AND: [
+          { slug },
+          {
+            OR: [
+              { isDraft: false },
+              ...(currentUserId ? [{ authorId: currentUserId }] : []),
+            ],
+          },
+        ],
+      },
       select: {
         slug: true,
         title: true,
         description: true,
         body: true,
         tagList: { select: { name: true } },
+        isDraft: true,
         createdAt: true,
         updatedAt: true,
         favoritedBy: { select: { id: true } },
@@ -74,11 +88,17 @@ export class ArticleService {
     userId: number,
     createArticleDto: CreateArticleBodyDto,
   ): Promise<SingleArticleResponse> {
-    const { title, description, body, tagList = [] } = createArticleDto;
+    const {
+      title,
+      description,
+      body,
+      tagList = [],
+      isDraft = true,
+    } = createArticleDto;
 
     const slug = slugify(title, { lower: true });
     const existing = await this.prismaService.article.findUnique({
-      where: { slug },
+      where: { slug, isDraft: false },
       select: { id: true },
     });
     if (existing)
@@ -93,6 +113,7 @@ export class ArticleService {
         title,
         description,
         body,
+        isDraft,
         authorId: userId,
         tagList: {
           connectOrCreate: tagList.map((tag: string) => ({
@@ -212,9 +233,17 @@ export class ArticleService {
 
     const articles = await this.prismaService.article.findMany({
       where: {
-        tagList: { some: { name: tag } },
-        author: { username: author },
-        favoritedBy: { some: { username: favorited } },
+        AND: [
+          { tagList: { some: { name: tag } } },
+          { author: { username: author } },
+          { favoritedBy: { some: { username: favorited } } },
+          {
+            OR: [
+              { isDraft: false },
+              ...(userId ? [{ author: { id: userId } }] : []),
+            ],
+          },
+        ],
       },
       skip: offset,
       take: limit,
@@ -262,7 +291,10 @@ export class ArticleService {
     if (followingIds.length === 0) return { articles: [], articlesCount: 0 };
 
     const articles = await this.prismaService.article.findMany({
-      where: { authorId: { in: followingIds } },
+      where: {
+        authorId: { in: followingIds },
+        isDraft: false,
+      },
       skip: offset,
       take: limit,
       orderBy: { createdAt: 'desc' },
@@ -295,8 +327,10 @@ export class ArticleService {
     userId: number,
     slug: string,
   ): Promise<SingleArticleResponse> {
-    const article = await this.prismaService.article.findUnique({
-      where: { slug },
+    const article = await this.prismaService.article.findFirst({
+      where: {
+        AND: [{ slug }, { OR: [{ isDraft: false }, { authorId: userId }] }],
+      },
       select: {
         id: true,
         favoritedBy: { select: { id: true } },
@@ -347,8 +381,10 @@ export class ArticleService {
     userId: number,
     slug: string,
   ): Promise<SingleArticleResponse> {
-    const article = await this.prismaService.article.findUnique({
-      where: { slug },
+    const article = await this.prismaService.article.findFirst({
+      where: {
+        AND: [{ slug }, { OR: [{ isDraft: false }, { authorId: userId }] }],
+      },
       select: {
         id: true,
         favoritedBy: { select: { id: true } },
@@ -406,6 +442,7 @@ export class ArticleService {
       description: article.description,
       body: article.body,
       tagList: article.tagList.map((tag) => tag.name),
+      isDraft: article.isDraft,
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
       favorited: userId

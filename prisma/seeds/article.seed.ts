@@ -9,6 +9,7 @@ export async function seedArticles(): Promise<void> {
       title: 'How to train your dragon',
       description: 'Ever wonder how?',
       body: 'It takes a Jacobian',
+      isDraft: false,
       authorId: 1,
     },
     {
@@ -16,6 +17,7 @@ export async function seedArticles(): Promise<void> {
       title: 'Health Benefits of Exercise',
       description: 'Why exercise is important',
       body: 'Regular exercise improves your health',
+      isDraft: false,
       authorId: 2,
     },
     {
@@ -23,6 +25,7 @@ export async function seedArticles(): Promise<void> {
       title: 'Latest Sports Updates',
       description: 'Today in sports news',
       body: 'Exciting matches happened today...',
+      isDraft: false,
       authorId: 1,
     },
     {
@@ -30,6 +33,21 @@ export async function seedArticles(): Promise<void> {
       title: 'Entertainment Industry Trends',
       description: 'What\'s new in entertainment',
       body: 'The entertainment industry is evolving rapidly...',
+      isDraft: false,
+      authorId: 2,
+    },
+    {
+      slug: 'draft-ai-future',
+      title: 'The Future of AI',
+      description: 'Speculations on AI development',
+      body: 'AI might take over the world or help us thrive.',
+      authorId: 1,
+    },
+    {
+      slug: 'draft-nutrition-guide',
+      title: 'Nutrition Guide for 2025',
+      description: 'Updated nutrition advice',
+      body: 'New guidelines for a balanced diet.',
       authorId: 2,
     },
   ];

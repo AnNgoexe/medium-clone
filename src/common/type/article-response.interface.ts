@@ -22,6 +22,7 @@ export interface Article {
   title: string;
   description: string;
   body: string;
+  isDraft: boolean;
   tagList: ArticleTag[];
   createdAt: Date;
   updatedAt: Date;
@@ -35,6 +36,7 @@ export interface ArticleResponseData {
   title: string;
   description: string;
   body: string;
+  isDraft: boolean;
   tagList: string[];
   createdAt: Date;
   updatedAt: Date;

@@ -34,6 +34,8 @@
     "limit_isInt": "Giới hạn phải là số nguyên.",
     "limit_min": "Giới hạn không được nhỏ hơn 0.",
     "offset_isInt": "Độ lệch phải là số nguyên.",
-    "offset_min": "Độ lệch không được nhỏ hơn 0."
+    "offset_min": "Độ lệch không được nhỏ hơn 0.",
+
+    "isDraft_isBoolean": "Trạng thái bản nháp phải là đúng hoặc sai."
   }
 }

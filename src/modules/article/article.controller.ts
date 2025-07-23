@@ -19,7 +19,6 @@ import { AuthType } from '@common/type/auth-type.enum';
 import { Auth } from '@common/decorator/auth.decorator';
 import { CreateArticleBodyDto } from '@modules/article/dto/create-article.body.dto';
 import { UpdateArticleBodyDto } from '@modules/article/dto/update-article.body.dto';
-import { Public } from '@common/decorator/public.decorator';
 import { Optional } from '@common/decorator/optional.decorator';
 import { ListArticlesQueryDto } from '@modules/article/dto/list-articles.query.dto';
 import { I18nService } from 'nestjs-i18n';
@@ -33,8 +32,11 @@ export class ArticleController {
 
   @Get('articles/:slug')
   @HttpCode(HttpStatus.OK)
-  @Public()
-  async getBySlug(@Param('slug') slug: string): Promise<ResponsePayload> {
+  @Optional()
+  async getBySlug(
+    @Req() req: Request,
+    @Param('slug') slug: string,
+  ): Promise<ResponsePayload> {
     if (!slug || slug.trim() === '') {
       throw new BadRequestException({
         ...ERROR_INVALID_SLUG,
@@ -42,7 +44,8 @@ export class ArticleController {
       });
     }
 
-    const article = await this.articleService.getArticleBySlug(slug);
+    const userId = req.user?.userId;
+    const article = await this.articleService.getArticleBySlug(slug, userId);
     return {
       message: this.i18n.translate('article.get.success'),
       data: article,

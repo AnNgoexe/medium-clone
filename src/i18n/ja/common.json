@@ -34,6 +34,8 @@
     "limit_isInt": "制限は整数である必要があります。",
     "limit_min": "制限は0未満にできません。",
     "offset_isInt": "オフセットは整数である必要があります。",
-    "offset_min": "オフセットは0未満にできません。"
+    "offset_min": "オフセットは0未満にできません。",
+
+    "isDraft_isBoolean": "下書き状態はtrueかfalseでなければなりません。"
   }
 }

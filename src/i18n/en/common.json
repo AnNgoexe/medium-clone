@@ -34,6 +34,8 @@
     "limit_isInt": "The limit must be a whole number.",
     "limit_min": "The limit cannot be less than 0.",
     "offset_isInt": "The offset must be a whole number.",
-    "offset_min": "The offset cannot be less than 0."
+    "offset_min": "The offset cannot be less than 0.",
+
+    "isDraft_isBoolean": "The draft status must be true or false."
   }
 }

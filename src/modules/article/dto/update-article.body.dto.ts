@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateArticleBodyDto {
   @IsOptional()
@@ -12,4 +12,8 @@ export class UpdateArticleBodyDto {
   @IsOptional()
   @IsString({ message: 'Body must be a string' })
   body?: string;
+
+  @IsOptional()
+  @IsBoolean({ message: 'isDraft must be a boolean' })
+  isDraft?: boolean;
 }

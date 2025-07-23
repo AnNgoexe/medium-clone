@@ -1,4 +1,10 @@
-import { IsOptional, IsString, IsNotEmpty, IsArray } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateArticleBodyDto {
   @IsNotEmpty({ message: 'Title must not be empty' })
@@ -17,4 +23,8 @@ export class CreateArticleBodyDto {
   @IsArray({ message: 'Tag list must be an array of strings' })
   @IsString({ each: true, message: 'Each tag must be a string' })
   tagList?: string[];
+
+  @IsOptional()
+  @IsBoolean({ message: 'isDraft must be a boolean' })
+  isDraft?: boolean;
 }
