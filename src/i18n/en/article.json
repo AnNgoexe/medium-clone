@@ -39,6 +39,9 @@
       "not_favorited_yet": "You haven't favorited this article yet."
     }
   },
+  "feed": {
+    "success": "Successfully retrieved feed articles"
+  },
   "error": {
     "bad_slug": "The provided article slug is invalid."
   }

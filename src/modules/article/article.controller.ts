@@ -135,6 +135,25 @@ export class ArticleController {
     };
   }
 
+  @Get('articles/feed')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async feed(
+    @Req() req: Request,
+    @Query() listArticlesQueryDto: ListArticlesQueryDto,
+  ): Promise<ResponsePayload> {
+    const userId = req.user?.userId as number;
+    const articles = await this.articleService.feedArticles(
+      userId,
+      listArticlesQueryDto,
+    );
+
+    return {
+      message: this.i18n.translate('article.feed.success'),
+      data: articles,
+    };
+  }
+
   @Post('articles/:slug/favorite')
   @HttpCode(HttpStatus.OK)
   @Auth(AuthType.ACCESS_TOKEN)

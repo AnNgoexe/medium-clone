@@ -39,6 +39,9 @@
       "not_favorited_yet": "Bạn chưa yêu thích bài viết này."
     }
   },
+  "feed": {
+    "success": "Lấy danh sách bài viết theo dõi thành công"
+  },
   "error": {
     "bad_slug": "Slug của bài viết không hợp lệ."
   }

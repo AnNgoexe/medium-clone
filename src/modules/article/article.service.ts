@@ -240,6 +240,49 @@ export class ArticleService {
     };
   }
 
+  async feedArticles(currentUserId: number, query: ListArticlesQueryDto) {
+    const limit = query.limit ?? ARTICLE_PAGINATION_DEFAULT_LIMIT;
+    const offset = query.offset ?? ARTICLE_PAGINATION_DEFAULT_OFFSET;
+
+    const followingUsers = await this.prismaService.user.findUnique({
+      where: { id: currentUserId },
+      select: { followings: { select: { id: true } } },
+    });
+
+    if (!followingUsers) return { articles: [], articlesCount: 0 };
+
+    const followingIds = followingUsers.followings.map((user) => user.id);
+    if (followingIds.length === 0) return { articles: [], articlesCount: 0 };
+
+    const articles = await this.prismaService.article.findMany({
+      where: { authorId: { in: followingIds } },
+      skip: offset,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true,
+            followers: { select: { id: true } },
+          },
+        },
+        tagList: { select: { name: true } },
+        favoritedBy: { select: { id: true } },
+      },
+    });
+
+    const articlesResponse = articles.map((article) =>
+      this.buildArticleResponse(article, currentUserId),
+    );
+
+    return {
+      articles: articlesResponse,
+      articlesCount: articles.length,
+    };
+  }
+
   async favoriteArticle(
     userId: number,
     slug: string,
