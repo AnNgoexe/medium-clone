@@ -200,4 +200,31 @@ export class ArticleController {
       data: article,
     };
   }
+
+  @Post('articles/publish')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async publishDrafts(
+    @Req() req: Request,
+    @Body('draftSlugs') draftSlugs: string[],
+  ): Promise<ResponsePayload> {
+    if (!Array.isArray(draftSlugs) || draftSlugs.length === 0) {
+      throw new BadRequestException({
+        message: this.i18n.translate('article.publish.error.invalid_slugs'),
+      });
+    }
+
+    const userId = req.user?.userId as number;
+    const articles = await this.articleService.publishDrafts(
+      userId,
+      draftSlugs,
+    );
+
+    return {
+      message: this.i18n.translate('article.publish.success', {
+        args: { count: articles.articlesCount },
+      }),
+      data: { articles },
+    };
+  }
 }

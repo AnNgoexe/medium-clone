@@ -98,7 +98,7 @@ export class ArticleService {
 
     const slug = slugify(title, { lower: true });
     const existing = await this.prismaService.article.findUnique({
-      where: { slug, isDraft: false },
+      where: { slug },
       select: { id: true },
     });
     if (existing)
@@ -430,6 +430,71 @@ export class ArticleService {
     });
 
     return { article: this.buildArticleResponse(updatedArticle, userId) };
+  }
+
+  async publishDrafts(
+    userId: number,
+    slugs: string[],
+  ): Promise<MutlipleArticleResponse> {
+    const drafts = await this.prismaService.article.findMany({
+      where: {
+        slug: { in: slugs },
+        authorId: userId,
+        isDraft: true,
+      },
+      include: {
+        tagList: { select: { name: true } },
+        favoritedBy: { select: { id: true } },
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true,
+            followers: { select: { id: true } },
+          },
+        },
+        comments: { select: { id: true } },
+      },
+    });
+
+    const foundSlugs = drafts.map((d) => d.slug);
+    const notFoundSlugs = slugs.filter((slug) => !foundSlugs.includes(slug));
+    if (notFoundSlugs.length > 0) {
+      throw new NotFoundException({
+        message: this.i18n.translate('article.publish.error', {
+          args: { slugs: notFoundSlugs.join(', ') },
+        }),
+      });
+    }
+
+    const updatedArticles = await Promise.all(
+      drafts.map((draft) =>
+        this.prismaService.article.update({
+          where: { slug: draft.slug },
+          data: { isDraft: false },
+          include: {
+            tagList: { select: { name: true } },
+            favoritedBy: { select: { id: true } },
+            author: {
+              select: {
+                username: true,
+                bio: true,
+                image: true,
+                followers: { select: { id: true } },
+              },
+            },
+            comments: { select: { id: true } },
+          },
+        }),
+      ),
+    );
+
+    return {
+      articles: updatedArticles.map((article) =>
+        this.buildArticleResponse(article, userId),
+      ),
+      articlesCount: updatedArticles.length,
+    };
   }
 
   private buildArticleResponse(

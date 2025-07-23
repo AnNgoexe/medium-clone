@@ -44,5 +44,9 @@
   },
   "error": {
     "bad_slug": "The provided article slug is invalid."
+  },
+  "publish": {
+    "success": "{{count}} draft(s) published successfully.",
+    "error": "One or more draft articles you want to publish do not exist: {{draftIds}}."
   }
 }
