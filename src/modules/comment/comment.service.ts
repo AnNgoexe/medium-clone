@@ -27,8 +27,15 @@ export class CommentService {
     body: string,
     slug: string,
   ): Promise<SingleCommentResponse> {
-    const article = await this.prisma.article.findUnique({
-      where: { slug: slug },
+    const article = await this.prisma.article.findFirst({
+      where: {
+        AND: [
+          { slug },
+          {
+            OR: [{ isDraft: false }, { authorId: userId }],
+          },
+        ],
+      },
       select: { id: true },
     });
     if (!article) {
@@ -74,8 +81,15 @@ export class CommentService {
     userId: number | undefined,
     slug: string,
   ): Promise<MultipleCommentResponse> {
-    const article = await this.prisma.article.findUnique({
-      where: { slug: slug },
+    const article = await this.prisma.article.findFirst({
+      where: {
+        AND: [
+          { slug },
+          {
+            OR: [{ isDraft: false }, ...(userId ? [{ authorId: userId }] : [])],
+          },
+        ],
+      },
       select: {
         comments: {
           select: {
@@ -138,8 +152,22 @@ export class CommentService {
   ): Promise<void> {
     const comment = await this.prisma.comment.findFirst({
       where: {
-        id: commentId,
-        article: { slug: slug },
+        AND: [
+          { id: commentId },
+          {
+            article: {
+              AND: [
+                { slug },
+                {
+                  OR: [
+                    { isDraft: false },
+                    ...(userId ? [{ authorId: userId }] : []),
+                  ],
+                },
+              ],
+            },
+          },
+        ],
       },
       select: {
         id: true,
