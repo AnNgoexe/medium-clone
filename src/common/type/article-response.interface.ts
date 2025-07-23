@@ -13,6 +13,10 @@ interface ArticleFavoritedBy {
   id: number;
 }
 
+interface ArticleComment {
+  id: number;
+}
+
 export interface Article {
   slug: string;
   title: string;
@@ -23,6 +27,7 @@ export interface Article {
   updatedAt: Date;
   favoritedBy: ArticleFavoritedBy[];
   author: ArticleAuthor;
+  comments: ArticleComment[];
 }
 
 export interface ArticleResponseData {
@@ -35,6 +40,7 @@ export interface ArticleResponseData {
   updatedAt: Date;
   favorited?: boolean;
   favoritesCount: number;
+  commentsCount: number;
   author: {
     username: string;
     bio: string | null;

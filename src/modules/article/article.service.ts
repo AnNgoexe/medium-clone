@@ -44,7 +44,7 @@ export class ArticleService {
         title: true,
         description: true,
         body: true,
-        tagList: true,
+        tagList: { select: { name: true } },
         createdAt: true,
         updatedAt: true,
         favoritedBy: { select: { id: true } },
@@ -57,6 +57,7 @@ export class ArticleService {
             followers: { select: { id: true } },
           },
         },
+        comments: { select: { id: true } },
       },
     });
 
@@ -111,6 +112,7 @@ export class ArticleService {
         },
         tagList: { select: { name: true } },
         favoritedBy: { select: { id: true } },
+        comments: { select: { id: true } },
       },
     });
 
@@ -193,6 +195,7 @@ export class ArticleService {
             followers: { select: { id: true } },
           },
         },
+        comments: { select: { id: true } },
       },
     });
 
@@ -227,6 +230,7 @@ export class ArticleService {
         },
         tagList: { select: { name: true } },
         favoritedBy: { select: { id: true } },
+        comments: { select: { id: true } },
       },
     });
 
@@ -240,7 +244,10 @@ export class ArticleService {
     };
   }
 
-  async feedArticles(currentUserId: number, query: ListArticlesQueryDto) {
+  async feedArticles(
+    currentUserId: number,
+    query: ListArticlesQueryDto,
+  ): Promise<MutlipleArticleResponse> {
     const limit = query.limit ?? ARTICLE_PAGINATION_DEFAULT_LIMIT;
     const offset = query.offset ?? ARTICLE_PAGINATION_DEFAULT_OFFSET;
 
@@ -270,6 +277,7 @@ export class ArticleService {
         },
         tagList: { select: { name: true } },
         favoritedBy: { select: { id: true } },
+        comments: { select: { id: true } },
       },
     });
 
@@ -318,8 +326,8 @@ export class ArticleService {
       where: { id: article.id },
       data: { favoritedBy: { connect: { id: userId } } },
       include: {
-        favoritedBy: true,
-        tagList: true,
+        favoritedBy: { select: { id: true } },
+        tagList: { select: { name: true } },
         author: {
           select: {
             username: true,
@@ -328,6 +336,7 @@ export class ArticleService {
             followers: { select: { id: true } },
           },
         },
+        comments: { select: { id: true } },
       },
     });
 
@@ -370,8 +379,8 @@ export class ArticleService {
       where: { id: article.id },
       data: { favoritedBy: { disconnect: { id: userId } } },
       include: {
-        favoritedBy: true,
-        tagList: true,
+        favoritedBy: { select: { id: true } },
+        tagList: { select: { name: true } },
         author: {
           select: {
             username: true,
@@ -380,6 +389,7 @@ export class ArticleService {
             followers: { select: { id: true } },
           },
         },
+        comments: { select: { id: true } },
       },
     });
 
@@ -402,6 +412,7 @@ export class ArticleService {
         ? article.favoritedBy.some((user) => user.id === userId)
         : undefined,
       favoritesCount: article.favoritedBy.length,
+      commentsCount: article.comments.length,
       author: {
         username: article.author.username,
         bio: article.author.bio,
