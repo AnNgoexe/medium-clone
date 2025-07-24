@@ -6,30 +6,27 @@ export async function seedArticleFavorites(): Promise<void> {
   const articleFavoritesData = [
     {
       userId: 1,
-      slug: 'how-to-train-your-dragon',
+      articleId: 1,
     },
     {
       userId: 2,
-      slug: 'health-benefits-of-exercise',
+      articleId: 2,
     },
     {
       userId: 1,
-      slug: 'latest-sports-updates',
+      articleId: 3,
     },
     {
       userId: 2,
-      slug: 'latest-sports-updates',
+      articleId: 3,
     },
   ];
 
-  for (const item of articleFavoritesData) {
-    await prisma.user.update({
-      where: { id: item.userId },
-      data: {
-        articles: {
-          connect: { slug: item.slug },
-        },
-      },
-    });
-  }
+  await prisma.favorite.createMany({
+    data: articleFavoritesData.map((item) => ({
+      userId: item.userId,
+      articleId: item.articleId,
+    })),
+    skipDuplicates: true,
+  });
 }

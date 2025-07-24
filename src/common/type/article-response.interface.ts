@@ -10,7 +10,7 @@ interface ArticleTag {
 }
 
 interface ArticleFavoritedBy {
-  id: number;
+  userId: number;
 }
 
 interface ArticleComment {

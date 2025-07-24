@@ -1,0 +1,1 @@
+export const MIN_INTERACTION_REACTIONS = 50;

@@ -227,4 +227,18 @@ export class ArticleController {
       data: { articles },
     };
   }
+
+  @Get('articles/interactions/high')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async getHighInteractionStats(@Req() req: Request): Promise<ResponsePayload> {
+    const userId = req.user?.userId as number;
+    const stats =
+      await this.articleService.getArticleHighInteractionStatistics(userId);
+
+    return {
+      message: this.i18n.translate('article.interaction.success'),
+      data: stats,
+    };
+  }
 }

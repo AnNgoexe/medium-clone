@@ -28,6 +28,11 @@ import {
   ARTICLE_PAGINATION_DEFAULT_OFFSET,
 } from '@common/constant/pagination.constant';
 import { I18nService } from 'nestjs-i18n';
+import {
+  HighInteractionArticleStatsResponse,
+  MonthlyHighInteractionStat,
+} from '@common/type/article-stats-response.interface';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ArticleService {
@@ -61,7 +66,7 @@ export class ArticleService {
         isDraft: true,
         createdAt: true,
         updatedAt: true,
-        favoritedBy: { select: { id: true } },
+        favoritedBy: { select: { userId: true } },
         author: {
           select: {
             id: true,
@@ -132,7 +137,7 @@ export class ArticleService {
           },
         },
         tagList: { select: { name: true } },
-        favoritedBy: { select: { id: true } },
+        favoritedBy: { select: { userId: true } },
         comments: { select: { id: true } },
       },
     });
@@ -207,7 +212,7 @@ export class ArticleService {
       data: data,
       include: {
         tagList: { select: { name: true } },
-        favoritedBy: { select: { id: true } },
+        favoritedBy: { select: { userId: true } },
         author: {
           select: {
             username: true,
@@ -236,7 +241,7 @@ export class ArticleService {
         AND: [
           { tagList: { some: { name: tag } } },
           { author: { username: author } },
-          { favoritedBy: { some: { username: favorited } } },
+          { favoritedBy: { some: { user: { username: favorited } } } },
           {
             OR: [
               { isDraft: false },
@@ -258,7 +263,7 @@ export class ArticleService {
           },
         },
         tagList: { select: { name: true } },
-        favoritedBy: { select: { id: true } },
+        favoritedBy: { select: { userId: true } },
         comments: { select: { id: true } },
       },
     });
@@ -308,7 +313,7 @@ export class ArticleService {
           },
         },
         tagList: { select: { name: true } },
-        favoritedBy: { select: { id: true } },
+        favoritedBy: { select: { userId: true } },
         comments: { select: { id: true } },
       },
     });
@@ -333,7 +338,8 @@ export class ArticleService {
       },
       select: {
         id: true,
-        favoritedBy: { select: { id: true } },
+        slug: true,
+        favoritedBy: { select: { userId: true } },
       },
     });
 
@@ -345,7 +351,7 @@ export class ArticleService {
     }
 
     const alreadyFavorited = article.favoritedBy.some(
-      (user) => user.id === userId,
+      (favorite) => favorite.userId === userId,
     );
     if (alreadyFavorited) {
       throw new ConflictException({
@@ -356,25 +362,14 @@ export class ArticleService {
       });
     }
 
-    const updatedArticle = await this.prismaService.article.update({
-      where: { id: article.id },
-      data: { favoritedBy: { connect: { id: userId } } },
-      include: {
-        favoritedBy: { select: { id: true } },
-        tagList: { select: { name: true } },
-        author: {
-          select: {
-            username: true,
-            bio: true,
-            image: true,
-            followers: { select: { id: true } },
-          },
-        },
-        comments: { select: { id: true } },
+    await this.prismaService.favorite.create({
+      data: {
+        user: { connect: { id: userId } },
+        article: { connect: { id: article.id } },
       },
     });
 
-    return { article: this.buildArticleResponse(updatedArticle, userId) };
+    return await this.getArticleBySlug(article.slug, userId);
   }
 
   async unfavoriteArticle(
@@ -387,7 +382,8 @@ export class ArticleService {
       },
       select: {
         id: true,
-        favoritedBy: { select: { id: true } },
+        slug: true,
+        favoritedBy: { select: { userId: true } },
       },
     });
 
@@ -399,7 +395,7 @@ export class ArticleService {
     }
 
     const alreadyFavorited = article.favoritedBy.some(
-      (user) => user.id === userId,
+      (user) => user.userId === userId,
     );
 
     if (!alreadyFavorited) {
@@ -411,25 +407,16 @@ export class ArticleService {
       });
     }
 
-    const updatedArticle = await this.prismaService.article.update({
-      where: { id: article.id },
-      data: { favoritedBy: { disconnect: { id: userId } } },
-      include: {
-        favoritedBy: { select: { id: true } },
-        tagList: { select: { name: true } },
-        author: {
-          select: {
-            username: true,
-            bio: true,
-            image: true,
-            followers: { select: { id: true } },
-          },
+    await this.prismaService.favorite.delete({
+      where: {
+        userId_articleId: {
+          userId,
+          articleId: article.id,
         },
-        comments: { select: { id: true } },
       },
     });
 
-    return { article: this.buildArticleResponse(updatedArticle, userId) };
+    return await this.getArticleBySlug(article.slug, userId);
   }
 
   async publishDrafts(
@@ -444,7 +431,7 @@ export class ArticleService {
       },
       include: {
         tagList: { select: { name: true } },
-        favoritedBy: { select: { id: true } },
+        favoritedBy: { select: { userId: true } },
         author: {
           select: {
             username: true,
@@ -474,7 +461,7 @@ export class ArticleService {
           data: { isDraft: false },
           include: {
             tagList: { select: { name: true } },
-            favoritedBy: { select: { id: true } },
+            favoritedBy: { select: { userId: true } },
             author: {
               select: {
                 username: true,
@@ -497,6 +484,32 @@ export class ArticleService {
     };
   }
 
+  async getArticleHighInteractionStatistics(
+    userId: number,
+  ): Promise<HighInteractionArticleStatsResponse> {
+    const articles = await this.prismaService.$queryRaw<
+      MonthlyHighInteractionStat[]
+    >(
+      Prisma.sql`
+      SELECT
+        EXTRACT(YEAR FROM a."createdAt")::int AS year,
+        EXTRACT(MONTH FROM a."createdAt")::int AS month,
+        a."slug",
+        COUNT(DISTINCT c."id") AS comments,
+        COUNT(DISTINCT f."userId") AS likes,
+        (COUNT(DISTINCT c."id") + COUNT(DISTINCT f."userId")) AS "totalInteraction"
+      FROM "articles" a
+      LEFT JOIN "comments" c ON c."articleId" = a."id"
+      LEFT JOIN "favorites" f ON f."articleId" = a."id"
+      WHERE a."authorId" = ${userId}
+      GROUP BY year, month, a."slug"
+      HAVING (COUNT(DISTINCT c."id") + COUNT(DISTINCT f."userId")) >= 50
+      ORDER BY year DESC, month DESC`,
+    );
+
+    return { articles };
+  }
+
   private buildArticleResponse(
     article: Article,
     userId?: number,
@@ -511,7 +524,7 @@ export class ArticleService {
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
       favorited: userId
-        ? article.favoritedBy.some((user) => user.id === userId)
+        ? article.favoritedBy.some((user) => user.userId === userId)
         : undefined,
       favoritesCount: article.favoritedBy.length,
       commentsCount: article.comments.length,
