@@ -46,8 +46,8 @@
     "bad_slug": "Slug của bài viết không hợp lệ."
   },
   "publish": {
-    "success": "Đã xuất bản {{count}} bản nháp thành công.",
-    "error": "Một hoặc nhiều bài viết nháp bạn muốn xuất bản không tồn tại: {{draftIds}}."
+    "success": "Đã xuất bản {count} bản nháp thành công.",
+    "error": "Một hoặc nhiều bài viết nháp bạn muốn xuất bản không tồn tại: {draftIds}."
   },
   "interaction": {
     "success": "Lấy bài viết có tương tác cao thành công"

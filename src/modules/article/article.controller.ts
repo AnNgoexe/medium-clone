@@ -30,6 +30,66 @@ export class ArticleController {
     private readonly i18n: I18nService,
   ) {}
 
+  @Get('articles/feed')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async feed(
+    @Req() req: Request,
+    @Query() listArticlesQueryDto: ListArticlesQueryDto,
+  ): Promise<ResponsePayload> {
+    const userId = req.user?.userId as number;
+    const articles = await this.articleService.feedArticles(
+      userId,
+      listArticlesQueryDto,
+    );
+
+    return {
+      message: this.i18n.translate('article.feed.success'),
+      data: articles,
+    };
+  }
+
+  @Post('articles/publish')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async publishDrafts(
+    @Req() req: Request,
+    @Body('draftSlugs') draftSlugs: string[],
+  ): Promise<ResponsePayload> {
+    if (!Array.isArray(draftSlugs) || draftSlugs.length === 0) {
+      throw new BadRequestException({
+        message: this.i18n.translate('article.publish.error.invalid_slugs'),
+      });
+    }
+
+    const userId = req.user?.userId as number;
+    const articles = await this.articleService.publishDrafts(
+      userId,
+      draftSlugs,
+    );
+
+    return {
+      message: this.i18n.translate('article.publish.success', {
+        args: { count: articles.articlesCount },
+      }),
+      data: { articles },
+    };
+  }
+
+  @Get('articles/interactions')
+  @HttpCode(HttpStatus.OK)
+  @Auth(AuthType.ACCESS_TOKEN)
+  async getHighInteractionStats(@Req() req: Request): Promise<ResponsePayload> {
+    const userId = req.user?.userId as number;
+    const stats =
+      await this.articleService.getArticleHighInteractionStatistics(userId);
+
+    return {
+      message: this.i18n.translate('article.interaction.success'),
+      data: stats,
+    };
+  }
+
   @Get('articles/:slug')
   @HttpCode(HttpStatus.OK)
   @Optional()
@@ -138,25 +198,6 @@ export class ArticleController {
     };
   }
 
-  @Get('articles/feed')
-  @HttpCode(HttpStatus.OK)
-  @Auth(AuthType.ACCESS_TOKEN)
-  async feed(
-    @Req() req: Request,
-    @Query() listArticlesQueryDto: ListArticlesQueryDto,
-  ): Promise<ResponsePayload> {
-    const userId = req.user?.userId as number;
-    const articles = await this.articleService.feedArticles(
-      userId,
-      listArticlesQueryDto,
-    );
-
-    return {
-      message: this.i18n.translate('article.feed.success'),
-      data: articles,
-    };
-  }
-
   @Post('articles/:slug/favorite')
   @HttpCode(HttpStatus.OK)
   @Auth(AuthType.ACCESS_TOKEN)
@@ -198,47 +239,6 @@ export class ArticleController {
     return {
       message: this.i18n.translate('article.unfavorite.success'),
       data: article,
-    };
-  }
-
-  @Post('articles/publish')
-  @HttpCode(HttpStatus.OK)
-  @Auth(AuthType.ACCESS_TOKEN)
-  async publishDrafts(
-    @Req() req: Request,
-    @Body('draftSlugs') draftSlugs: string[],
-  ): Promise<ResponsePayload> {
-    if (!Array.isArray(draftSlugs) || draftSlugs.length === 0) {
-      throw new BadRequestException({
-        message: this.i18n.translate('article.publish.error.invalid_slugs'),
-      });
-    }
-
-    const userId = req.user?.userId as number;
-    const articles = await this.articleService.publishDrafts(
-      userId,
-      draftSlugs,
-    );
-
-    return {
-      message: this.i18n.translate('article.publish.success', {
-        args: { count: articles.articlesCount },
-      }),
-      data: { articles },
-    };
-  }
-
-  @Get('articles/interactions/high')
-  @HttpCode(HttpStatus.OK)
-  @Auth(AuthType.ACCESS_TOKEN)
-  async getHighInteractionStats(@Req() req: Request): Promise<ResponsePayload> {
-    const userId = req.user?.userId as number;
-    const stats =
-      await this.articleService.getArticleHighInteractionStatistics(userId);
-
-    return {
-      message: this.i18n.translate('article.interaction.success'),
-      data: stats,
     };
   }
 }
