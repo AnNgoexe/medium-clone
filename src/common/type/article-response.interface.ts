@@ -1,4 +1,5 @@
 interface ArticleAuthor {
+  id?: number;
   username: string;
   bio: string | null;
   image: string | null;
@@ -10,7 +11,7 @@ interface ArticleTag {
 }
 
 interface ArticleFavoritedBy {
-  id: number;
+  userId: number;
 }
 
 interface ArticleComment {

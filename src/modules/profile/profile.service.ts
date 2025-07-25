@@ -71,7 +71,7 @@ export class ProfileService {
     if (!userToUnfollow) {
       throw new NotFoundException({
         ...ERROR_USER_NOT_FOUND,
-        message: this.i18n.translate('profile.get.error', {
+        message: this.i18n.translate('profile.unfollow.error', {
           args: { username },
         }),
       });
@@ -121,7 +121,7 @@ export class ProfileService {
     if (!userToFollow) {
       throw new NotFoundException({
         ...ERROR_USER_NOT_FOUND,
-        message: this.i18n.translate('profile.get.error'),
+        message: this.i18n.translate('profile.follow.error'),
       });
     }
 

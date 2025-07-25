@@ -35,7 +35,9 @@ export class ProfileController {
       username,
     );
     return {
-      message: 'Profile retrieved successfully',
+      message: this.i18n.translate('profile.get.success', {
+        args: { username: username },
+      }),
       data: profile,
     };
   }
@@ -67,7 +69,7 @@ export class ProfileController {
     const userId = req.user?.userId as number;
     const profile = await this.profileService.unfollowUser(userId, username);
     return {
-      message: this.i18n.translate('profile.unfollow.success.', {
+      message: this.i18n.translate('profile.unfollow.success', {
         args: { username },
       }),
       data: profile,

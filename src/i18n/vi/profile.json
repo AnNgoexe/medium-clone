@@ -1,19 +1,20 @@
 {
   "get": {
-    "error": "Không tìm thấy hồ sơ của {{username}}."
+    "error": "Không tìm thấy hồ sơ của {username}.",
+    "success": "Lấy thông tin hồ sơ của {username} thành công."
   },
   "follow": {
     "error": {
       "cannot_follow_self": "Bạn không thể theo dõi chính mình.",
       "already_following": "Bạn đã theo dõi người dùng này rồi."
     },
-    "success": "Bạn đã theo dõi {{username}}!"
+    "success": "Bạn đã theo dõi {username}!"
   },
   "unfollow": {
     "error": {
       "cannot_unfollow_self": "Bạn không thể bỏ theo dõi chính mình.",
       "not_following_user": "Bạn chưa theo dõi người dùng này."
     },
-    "success": "Bạn đã bỏ theo dõi {{username}}."
+    "success": "Bạn đã bỏ theo dõi {username}."
   }
 }
